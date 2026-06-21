@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% set page_title = 'Healthcare Statistics' %}
+{% block content %}
+<div class="row g-4 mt-2">
+    <div class="col-lg-4">
+        <div class="content-card">
+            <h5>Add Health Statistics</h5>
+            <form method="POST">
+                <label class="form-label">Date</label>
+                <input type="date" name="stat_date" class="form-control mb-3" required>
+
+                <label class="form-label">Patients Count</label>
+                <input type="number" name="patients_count" class="form-control mb-3" required>
+
+                <label class="form-label">Doctors Count</label>
+                <input type="number" name="doctors_count" class="form-control mb-3" required>
+
+                <label class="form-label">Appointments Count</label>
+                <input type="number" name="appointments_count" class="form-control mb-3" required>
+
+                <label class="form-label">Emergency Cases</label>
+                <input type="number" name="emergency_cases" class="form-control mb-3" required>
+
+                <button class="btn btn-primary w-100">Save Statistics</button>
+            </form>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="content-card">
+            <h5>Saved Healthcare Statistics</h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead><tr><th>Date</th><th>Patients</th><th>Doctors</th><th>Appointments</th><th>Emergency</th><th>Action</th></tr></thead>
+                    <tbody>
+                    {% for s in stats %}
+                    <tr>
+                        <td>{{ s.stat_date }}</td>
+                        <td>{{ s.patients_count }}</td>
+                        <td>{{ s.doctors_count }}</td>
+                        <td>{{ s.appointments_count }}</td>
+                        <td>{{ s.emergency_cases }}</td>
+                        <td><a href="{{ url_for('delete_health_stat', stat_id=s.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this record?')">Delete</a></td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

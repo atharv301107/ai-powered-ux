@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="login-wrapper">
+    <div class="login-card">
+        <div class="text-center mb-4">
+            <div class="login-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+            <h2>Admin Login</h2>
+            <p>Healthcare Portal Dashboard</p>
+        </div>
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" value="admin@gmail.com" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" value="admin123" required>
+            </div>
+            <button class="btn btn-primary w-100">Login</button>
+        </form>
+        <div class="demo-box mt-4">
+            <b>Demo Login</b><br>
+            Email: admin@gmail.com<br>
+            Password: admin123
+        </div>
+    </div>
+</div>
+{% endblock %}
