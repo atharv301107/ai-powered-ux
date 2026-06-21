@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Appointments | MediCare</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🏥</div>
+    <h2>MediCare</h2>
+    <span>Patient Portal</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Main</div>
+    <a href="/" class="nav-link"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a href="/appointments" class="nav-link active"><span class="nav-icon">📅</span> Appointments</a>
+    <a href="/reminders" class="nav-link"><span class="nav-icon">💊</span> Medicine Reminders</a>
+    <div class="nav-label">Health</div>
+    <a href="#" class="nav-link"><span class="nav-icon">📋</span> Medical Records</a>
+    <a href="#" class="nav-link"><span class="nav-icon">📊</span> Health Reports</a>
+    <div class="nav-label">Account</div>
+    <a href="#" class="nav-link"><span class="nav-icon">⚙️</span> Settings</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar" id="sidebar-avatar">?</div>
+      <div class="user-info">
+        <div class="name" data-auth-name>Loading...</div>
+        <div class="role" data-auth-role>Patient</div>
+      </div>
+    </div>
+    <button data-logout style="margin-top:10px;width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#a8b8cc;font-size:12px;cursor:pointer;">
+      🚪 Logout
+    </button>
+  </div>
+</aside>
+
+<div class="main-wrap">
+  <header class="topbar">
+    <span class="topbar-title">Appointments <span>Manage your visits</span></span>
+    <div class="topbar-actions">
+      <span style="font-size:13px;color:var(--text-sub);font-weight:600;" id="live-clock"></span>
+      <button class="topbar-btn">🔔<span class="notif-dot"></span></button>
+    </div>
+  </header>
+
+  <main class="page-content">
+
+    <!-- Hero Banner -->
+    <div class="page-hero">
+      <div>
+        <h1>Appointment Management</h1>
+        <p>Book, track and manage all your doctor appointments in one place.</p>
+        <div style="margin-top:16px;">
+          <button class="btn btn-primary" data-modal-open="appt-modal">
+            + Book New Appointment
+          </button>
+        </div>
+      </div>
+      <div class="page-hero-icon">📅</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid" style="margin-bottom:24px;">
+      <div class="stat-card">
+        <div class="stat-icon teal">🔜</div>
+        <div>
+          <div class="stat-value">{{ appointments | selectattr('status', 'eq', 'upcoming') | list | length }}</div>
+          <div class="stat-label">Upcoming</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">✅</div>
+        <div>
+          <div class="stat-value">{{ appointments | selectattr('status', 'eq', 'completed') | list | length }}</div>
+          <div class="stat-label">Completed</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon amber">👨‍⚕️</div>
+        <div>
+          <div class="stat-value">{{ doctors | length }}</div>
+          <div class="stat-label">Doctors Available</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon indigo">📊</div>
+        <div>
+          <div class="stat-value">{{ appointments | length }}</div>
+          <div class="stat-label">Total Appointments</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Appointments List -->
+    <div class="grid-2">
+
+      <!-- Upcoming -->
+      <div class="card">
+        <div class="card-header">
+          <h3>🔜 Upcoming Appointments</h3>
+        </div>
+        {% set upcoming = appointments | selectattr('status', 'eq', 'upcoming') | list %}
+        {% if upcoming %}
+          {% for appt in upcoming %}
+          {% set parts = appt.date.split('-') %}
+          <div class="appt-card">
+            <div class="appt-big-date">
+              <div class="d">{{ parts[2] }}</div>
+              <div class="m">{{ ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parts[1]|int - 1] }}</div>
+            </div>
+            <div class="appt-details">
+              <div class="dr">{{ appt.doctor }}</div>
+              <div class="meta">{{ appt.specialty }} &nbsp;·&nbsp; {{ appt.time }}</div>
+            </div>
+            <div class="appt-actions">
+              <span class="status-pill upcoming">Upcoming</span>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-state">
+            <div class="icon">🗓️</div>
+            <p>No upcoming appointments.<br>Book one above!</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Past / Completed -->
+      <div class="card">
+        <div class="card-header">
+          <h3>📂 Past Appointments</h3>
+        </div>
+        {% set past = appointments | selectattr('status', 'eq', 'completed') | list %}
+        {% if past %}
+          {% for appt in past %}
+          {% set parts = appt.date.split('-') %}
+          <div class="appt-card">
+            <div class="appt-big-date" style="background:var(--success-light);">
+              <div class="d" style="color:#065f46;">{{ parts[2] }}</div>
+              <div class="m" style="color:var(--success);">{{ ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parts[1]|int - 1] }}</div>
+            </div>
+            <div class="appt-details">
+              <div class="dr">{{ appt.doctor }}</div>
+              <div class="meta">{{ appt.specialty }} &nbsp;·&nbsp; {{ appt.time }}</div>
+            </div>
+            <span class="status-pill completed">Done</span>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-state">
+            <div class="icon">📂</div>
+            <p>No past appointments yet.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Doctors Available -->
+    <div class="card" style="margin-top:24px;">
+      <div class="card-header">
+        <h3>👨‍⚕️ Available Doctors</h3>
+        <span style="font-size:12px;color:var(--text-sub);">{{ doctors | length }} doctors</span>
+      </div>
+      <div class="card-body" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;">
+        {% for doc in doctors %}
+        <div style="padding:16px;border:1.5px solid var(--border);border-radius:12px;transition:all 0.2s;"
+             onmouseenter="this.style.borderColor='var(--primary)';this.style.background='var(--primary-light)'"
+             onmouseleave="this.style.borderColor='var(--border)';this.style.background='transparent'">
+          <div style="font-size:30px;margin-bottom:8px;">👨‍⚕️</div>
+          <div style="font-weight:700;font-size:14px;margin-bottom:3px;">{{ doc.name }}</div>
+          <div style="color:var(--text-sub);font-size:12px;margin-bottom:12px;">{{ doc.specialty }}</div>
+          <button class="btn btn-primary btn-sm" style="width:100%;" data-modal-open="appt-modal">Book Now</button>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- BOOK APPOINTMENT MODAL -->
+<div class="modal-overlay" id="appt-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>📅 Book Appointment</h3>
+      <button class="modal-close" data-modal-close>✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="appt-form" class="booking-form">
+        <div class="form-group">
+          <label class="form-label">Select Doctor</label>
+          <select class="form-select" id="doctor-select" required>
+            <option value="">-- Choose a doctor --</option>
+            {% for doc in doctors %}
+            <option value="{{ doc.name }}">{{ doc.name }} — {{ doc.specialty }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Specialty</label>
+          <input class="form-input" id="specialty-input" placeholder="Auto-filled" readonly />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Preferred Date</label>
+          <input type="date" class="form-input" id="appt-date" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Preferred Time</label>
+          <select class="form-select" id="appt-time" required>
+            <option value="">-- Select time --</option>
+            <option>09:00 AM</option><option>10:00 AM</option><option>11:00 AM</option>
+            <option>12:00 PM</option><option>02:00 PM</option><option>03:00 PM</option>
+            <option>04:00 PM</option><option>05:00 PM</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label class="form-label">Reason (optional)</label>
+          <input type="text" class="form-input" placeholder="e.g. Follow-up, checkup, new symptom..." />
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" data-modal-close>Cancel</button>
+      <button type="submit" form="appt-form" class="btn btn-primary">Book Appointment</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container"></div>
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

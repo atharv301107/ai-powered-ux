@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrescribeScan - Advanced OCR System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Include Tesseract.js CDN for real text extraction -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="logo">💊 PrescribeScan</div>
+        <div class="owner-badge">Owner: Shreya Jadhav</div>
+    </header>
+
+    <main class="dashboard">
+        <!-- Left Side: Upload -->
+        <section class="card upload-section">
+            <h2>Upload Prescription</h2>
+            <p class="subtitle">Supports JPG, PNG, or WebP. Max size: 5MB.</p>
+            
+            <div class="drop-zone" id="dropZone">
+                <div class="drop-zone-content">
+                    <div class="upload-icon">📤</div>
+                    <p><strong>Drag & drop your prescription here</strong> or <span class="browse-btn">browse files</span></p>
+                </div>
+                <input type="file" id="fileInput" accept="image/png, image/jpeg, image/webp" hidden>
+            </div>
+
+            <div class="preview-container hidden" id="previewContainer">
+                <div class="file-info">
+                    <span id="fileName">prescription.jpg</span>
+                    <button id="removeBtn" class="remove-btn">✕</button>
+                </div>
+                <img id="imagePreview" src="" alt="Prescription Preview">
+            </div>
+
+            <button id="extractBtn" class="btn-primary" disabled>Extract Prescription Text</button>
+        </section>
+
+        <!-- Right Side: Results -->
+        <section class="card result-section">
+            <h2>Extracted Text</h2>
+            <p class="subtitle">AI-powered OCR extraction results will appear below.</p>
+
+            <!-- Loading State with dynamic percentage tracker -->
+            <div class="loader-container hidden" id="loader">
+                <div class="spinner"></div>
+                <p id="progressText">Initializing OCR Engine...</p>
+            </div>
+
+            <div class="empty-state" id="emptyState">
+                <div class="empty-icon">📄</div>
+                <p>No prescription uploaded yet. Upload an image to see the text extraction.</p>
+            </div>
+
+            <div class="result-content hidden" id="resultContent">
+                <div class="success-badge">✓ Extraction Successful</div>
+                <div class="extracted-text-box">
+                    <pre id="ocrOutput"></pre>
+                </div>
+                <button id="copyBtn" class="btn-secondary">Copy to Clipboard</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+{% extends 'public_base.html' %}
+{% block title %}Book Appointment{% endblock %}
+
+{% block content %}
+<section style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); color:#fff; padding: 60px 5%; text-align: center;">
+  <div style="max-width: 600px; margin: 0 auto;">
+    <h2 style="font-family:var(--font-head); font-weight:800; font-size:32px;">Book an Appointment</h2>
+    <p style="color:rgba(255,255,255,0.7); font-size:14px; margin-top:8px;">Schedule a physical or virtual consultation with our board-certified clinical specialists.</p>
+  </div>
+</section>
+
+<section style="padding: 60px 5%; background: var(--bg); display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;">
+  <!-- Left Side: Information Card -->
+  <div style="flex: 1; min-width: 320px; max-width: 420px; display: flex; flex-direction: column; gap: 20px;">
+    <div class="content-card" style="padding: 30px;">
+      <h4 style="font-family: var(--font-head); font-weight: 800; color: var(--text-heading); margin-bottom: 16px;">Booking Guide</h4>
+      <p style="color: var(--text-sub); font-size: 13.5px; line-height: 1.6; margin-bottom: 20px;">
+        Follow these steps to schedule your appointment successfully:
+      </p>
+      
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div style="display: flex; gap: 12px; align-items: flex-start;">
+          <span style="font-size: 14px; background: var(--primary-light); color: var(--primary); font-weight: 700; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">1</span>
+          <div>
+            <h6 style="font-weight: 700; color: var(--text-heading); font-size: 13.5px;">Select Department</h6>
+            <p style="color: var(--text-sub); font-size: 12px;">Choose the appropriate clinical speciality for your condition.</p>
+          </div>
+        </div>
+        
+        <div style="display: flex; gap: 12px; align-items: flex-start;">
+          <span style="font-size: 14px; background: var(--primary-light); color: var(--primary); font-weight: 700; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">2</span>
+          <div>
+            <h6 style="font-weight: 700; color: var(--text-heading); font-size: 13.5px;">Choose Practitioner</h6>
+            <p style="color: var(--text-sub); font-size: 12px;">Select from available specialist doctors assigned to that department.</p>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; align-items: flex-start;">
+          <span style="font-size: 14px; background: var(--primary-light); color: var(--primary); font-weight: 700; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">3</span>
+          <div>
+            <h6 style="font-weight: 700; color: var(--text-heading); font-size: 13.5px;">Select Date &amp; Time Slot</h6>
+            <p style="color: var(--text-sub); font-size: 12px;">Choose an available date and preferred operational shift timing.</p>
+          </div>
+        </div>
+      </div>
+      
+      <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-sub);">
+        🚨 <strong>Emergency?</strong> Please do not use this online booking system. Navigate directly to <a href="/emergency" style="color: var(--danger); font-weight: 700;">Emergency Care</a> or call 102.
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side: Booking Form Card -->
+  <div style="flex: 1.5; min-width: 320px; max-width: 600px;">
+    <div class="content-card" style="padding: 40px; box-shadow: var(--shadow-md);">
+      <h3 style="font-family: var(--font-head); font-weight: 800; color: var(--text-heading); margin-bottom: 24px;">Request an Appointment</h3>
+      
+      <form method="POST" action="{{ url_for('book_appointment') }}" id="bookingForm">
+        <!-- Patient Name -->
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label class="form-label" style="font-weight: 600; color: var(--text-heading); display: block; margin-bottom: 6px;">Patient Full Name</label>
+          <div class="input-icon-wrap" style="position: relative;">
+            <span class="input-prefix" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 16px;">👤</span>
+            <input type="text" name="patient_name" class="form-control" placeholder="Enter patient's full name" required style="padding-left: 42px; width: 100%;" />
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+          <!-- Department -->
+          <div class="form-group">
+            <label class="form-label" style="font-weight: 600; color: var(--text-heading); display: block; margin-bottom: 6px;">Speciality Department</label>
+            <select name="department" id="deptSelect" class="form-control" required style="width: 100%;">
+              <option value="" disabled selected>Select Department</option>
+              <option value="Cardiology">Cardiology</option>
+              <option value="Neurology">Neurology</option>
+              <option value="Orthopedics">Orthopedics</option>
+              <option value="Pediatrics">Pediatrics</option>
+              <option value="Dermatology">Dermatology</option>
+              <option value="ENT">ENT</option>
+              <option value="Gynecology">Gynecology</option>
+              <option value="General Medicine">General Medicine</option>
+              <option value="Emergency Care">Emergency Care</option>
+              <option value="Radiology">Radiology</option>
+            </select>
+          </div>
+
+          <!-- Doctor -->
+          <div class="form-group">
+            <label class="form-label" style="font-weight: 600; color: var(--text-heading); display: block; margin-bottom: 6px;">Doctor / Clinician</label>
+            <select name="doctor_name" id="docSelect" class="form-control" required style="width: 100%;" disabled>
+              <option value="" disabled selected>Choose department first</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+          <!-- Appointment Date -->
+          <div class="form-group">
+            <label class="form-label" style="font-weight: 600; color: var(--text-heading); display: block; margin-bottom: 6px;">Preferred Date</label>
+            <input type="date" name="appointment_date" class="form-control" required style="width: 100%;" id="apptDate" />
+          </div>
+
+          <!-- Preferred Time -->
+          <div class="form-group">
+            <label class="form-label" style="font-weight: 600; color: var(--text-heading); display: block; margin-bottom: 6px;">Preferred Shift / Time</label>
+            <select name="time" class="form-control" required style="width: 100%;">
+              <option value="09:00 AM">09:00 AM - Morning</option>
+              <option value="10:30 AM">10:30 AM - Morning</option>
+              <option value="11:30 AM">11:30 AM - Morning</option>
+              <option value="02:00 PM">02:00 PM - Afternoon</option>
+              <option value="03:30 PM">03:30 PM - Afternoon</option>
+              <option value="05:00 PM">05:00 PM - Evening</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; margin-top: 10px;">
+          Submit Booking Request →
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  // Doctors data passed from Flask template context
+  const rawDoctors = {{ doctors | tojson }};
+
+  const deptSelect = document.getElementById('deptSelect');
+  const docSelect = document.getElementById('docSelect');
+  const apptDate = document.getElementById('apptDate');
+
+  // Disable past dates in date picker
+  const today = new Date().toISOString().split('T')[0];
+  apptDate.min = today;
+
+  // Filter doctors list dynamically based on department selection
+  deptSelect.addEventListener('change', () => {
+    const selectedDept = deptSelect.value;
+    
+    // Clear previous options
+    docSelect.innerHTML = '';
+    docSelect.disabled = false;
+
+    // Filter list
+    const filteredDocs = rawDoctors.filter(doc => doc.department.toLowerCase() === selectedDept.toLowerCase());
+
+    if (filteredDocs.length === 0) {
+      const opt = document.createElement('option');
+      opt.value = "";
+      opt.disabled = true;
+      opt.selected = true;
+      opt.textContent = "No doctors available in this department";
+      docSelect.appendChild(opt);
+    } else {
+      const defaultOpt = document.createElement('option');
+      defaultOpt.value = "";
+      defaultOpt.disabled = true;
+      defaultOpt.selected = true;
+      defaultOpt.textContent = "Select Specialist";
+      docSelect.appendChild(defaultOpt);
+
+      filteredDocs.forEach(doc => {
+        const opt = document.createElement('option');
+        opt.value = doc.name;
+        opt.textContent = doc.name;
+        docSelect.appendChild(opt);
+      });
+    }
+  });
+
+  // Pre-fill department and doctor from URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const paramDept = urlParams.get('department');
+  const paramDoc = urlParams.get('doctor');
+
+  if (paramDept) {
+    deptSelect.value = paramDept;
+    deptSelect.dispatchEvent(new Event('change'));
+    if (paramDoc) {
+      setTimeout(() => {
+        docSelect.value = paramDoc;
+      }, 50);
+    }
+  }
+</script>
+{% endblock %}

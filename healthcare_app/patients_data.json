@@ -1,0 +1,78 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "rahul.patil",
+      "name": "Rahul Patil",
+      "role": "patient",
+      "age": 32,
+      "blood_group": "B+",
+      "phone": "+91 98765 43210",
+      "email": "patient@healthcare.com",
+      "address": "Ichalkaranji, Maharashtra",
+      "doctor": "Dr. Sneha Patil",
+      "medical_records": [
+        {
+          "date": "2026-03-15",
+          "diagnosis": "Hypertension",
+          "doctor": "Dr. Sneha Patil",
+          "notes": "Blood pressure elevated. Started on Amlodipine 5mg."
+        },
+        {
+          "date": "2026-01-20",
+          "diagnosis": "Vitamin D Deficiency",
+          "doctor": "Dr. Ravi Desai",
+          "notes": "Low Vitamin D levels. Supplement prescribed."
+        },
+        {
+          "date": "2025-11-10",
+          "diagnosis": "Routine Checkup",
+          "doctor": "Dr. Sneha Patil",
+          "notes": "All vitals normal. Recommended annual review."
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "username": "testpatient_3067",
+      "name": "Test Patient 3067",
+      "role": "patient",
+      "age": 30,
+      "blood_group": "\u2014",
+      "phone": "+91987653067",
+      "email": "testpatient_3067@smartcare.com",
+      "address": "\u2014",
+      "gender": "Female",
+      "doctor": "Dr. Sneha Patil",
+      "medical_records": []
+    },
+    {
+      "id": 13,
+      "username": "testpatient_8979",
+      "name": "Test Patient 8979",
+      "role": "patient",
+      "age": 30,
+      "blood_group": "\u2014",
+      "phone": "+91987658979",
+      "email": "testpatient_8979@smartcare.com",
+      "address": "\u2014",
+      "gender": "Female",
+      "doctor": "Dr. Sneha Patil",
+      "medical_records": []
+    },
+    {
+      "id": 14,
+      "username": "ghodeatharv553",
+      "name": "Atharv",
+      "role": "patient",
+      "age": 18,
+      "blood_group": "\u2014",
+      "phone": "0000000000",
+      "email": "ghodeatharv553@gmail.com",
+      "address": "\u2014",
+      "gender": "Male",
+      "doctor": "Dr. Sneha Patil",
+      "medical_records": []
+    }
+  ]
+}

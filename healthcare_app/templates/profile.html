@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% block title %}My Profile{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header reveal" style="margin-bottom:24px;">
+  <h2 style="font-family:var(--font-head);font-weight:800;color:var(--text-heading);margin-bottom:4px;">Account Settings</h2>
+  <p style="color:var(--text-sub);font-size:13.5px;margin-bottom:0;">Configure personal details, security credentials, and system settings.</p>
+</div>
+
+<!-- Profile split view -->
+<div class="grid-2 reveal" style="margin-bottom:40px;align-items:flex-start;">
+  <!-- LEFT: Profile info & stats card -->
+  <div style="display:flex;flex-direction:column;gap:20px;">
+    <!-- Main details -->
+    <div class="content-card" style="padding:28px;text-align:center;">
+      <div class="tb-avatar" style="width:80px;height:80px;font-size:28px;margin:0 auto 16px;box-shadow:var(--shadow);">
+        {{ user.name[0].upper() }}
+      </div>
+      <h3 style="font-family:var(--font-head);font-weight:800;color:var(--text-heading);margin-bottom:4px;">{{ user.name }}</h3>
+      <p style="color:var(--text-sub);font-size:13px;margin-bottom:14px;">{{ user.email }}</p>
+      
+      <div style="display:flex;justify-content:center;gap:10px;margin-bottom:20px;">
+        <span class="role-chip">{{ user.role }}</span>
+        <span class="status-badge status-{{ user.status|lower }}">{{ user.status }}</span>
+      </div>
+
+      <div style="border-top:1px solid var(--border-subtle);padding-top:16px;font-size:12.5px;color:var(--text-muted);">
+        <span>📅 Member Since: <strong>{{ user.created_at or '2026-06-20' }}</strong></span>
+      </div>
+    </div>
+
+    <!-- Quick navigation -->
+    <div class="content-card" style="padding:22px;">
+      <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text-heading);margin-bottom:12px;">🔗 Quick Links</h5>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <a href="{{ url_for('dashboard_home') }}" class="btn btn-outline btn-sm" style="border:1px solid var(--border);">🏠 Dashboard</a>
+        <a href="{{ url_for('chatbot') }}" class="btn btn-outline btn-sm" style="border:1px solid var(--border);">🤖 AI Bot</a>
+        <a href="{{ url_for('ocr') }}" class="btn btn-outline btn-sm" style="border:1px solid var(--border);">📷 OCR Scan</a>
+        <a href="{{ url_for('analytics') }}" class="btn btn-outline btn-sm" style="border:1px solid var(--border);">🔮 Analytics</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Tabbed Preferences Form -->
+  <div class="content-card" style="padding:28px;">
+    <!-- Tab list -->
+    <div style="display:flex;border-bottom:1.5px solid var(--border);margin-bottom:24px;gap:16px;">
+      <button class="btn btn-ghost tab-btn active" data-tab="personal" style="border-bottom:3px solid var(--primary);border-radius:0;padding:8px 12px;font-weight:700;">👤 Profile Info</button>
+      <button class="btn btn-ghost tab-btn" data-tab="security" style="border-radius:0;padding:8px 12px;">🔒 Security Settings</button>
+      <button class="btn btn-ghost tab-btn" data-tab="preferences" style="border-radius:0;padding:8px 12px;">⚙️ Preferences</button>
+    </div>
+
+    <!-- Tab 1: Personal Profile Details -->
+    <div class="tab-panel" id="personal">
+      <form method="POST" action="{{ url_for('profile') }}" id="profileForm">
+        <div class="form-group" style="margin-bottom:14px;">
+          <label class="form-label" for="profile-name">Full Name</label>
+          <div class="input-icon-wrap">
+            <span class="input-prefix">👤</span>
+            <input type="text" id="profile-name" name="name" class="form-control" value="{{ user.name }}" required />
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:20px;">
+          <label class="form-label" for="profile-email">Email Address</label>
+          <div class="input-icon-wrap">
+            <span class="input-prefix">📧</span>
+            <input type="email" id="profile-email" name="email" class="form-control" value="{{ user.email }}" required />
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="saveProfileBtn">Save Profile Details</button>
+      </form>
+    </div>
+
+    <!-- Tab 2: Security settings -->
+    <div class="tab-panel hidden" id="security">
+      <form method="POST" action="{{ url_for('profile') }}" id="securityForm">
+        <!-- Hidden name and email to prevent overriding -->
+        <input type="hidden" name="name" value="{{ user.name }}" />
+        <input type="hidden" name="email" value="{{ user.email }}" />
+
+        <div class="form-group" style="margin-bottom:14px;">
+          <label class="form-label" for="new-pw">New Password</label>
+          <div class="input-icon-wrap" style="position:relative;">
+            <span class="input-prefix">🔒</span>
+            <input type="password" id="new-pw" name="password" class="form-control" placeholder="••••••••" required style="padding-right:40px;" />
+            <button type="button" class="pw-toggle" id="pw-toggle-new" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;">👁️</button>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:20px;">
+          <label class="form-label" for="confirm-pw">Confirm New Password</label>
+          <div class="input-icon-wrap" style="position:relative;">
+            <span class="input-prefix">🔒</span>
+            <input type="password" id="confirm-pw" class="form-control" placeholder="••••••••" required style="padding-right:40px;" />
+            <button type="button" class="pw-toggle" id="pw-toggle-confirm" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;">👁️</button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="saveSecBtn">Update Account Password</button>
+      </form>
+    </div>
+
+    <!-- Tab 3: System Preferences -->
+    <div class="tab-panel hidden" id="preferences">
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <strong style="display:block;color:var(--text-heading);">System Dark Theme</strong>
+            <span style="font-size:12px;color:var(--text-sub);">Enable low light interface modes.</span>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="toggleTheme()" id="prefThemeBtn">Toggle Theme</button>
+        </div>
+        
+        <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border-subtle);padding-top:14px;">
+          <div>
+            <strong style="display:block;color:var(--text-heading);">Dashboard Push Status</strong>
+            <span style="font-size:12px;color:var(--text-sub);">Receive notifications about medicine reminders.</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" checked onchange="showToast('Notification settings saved.', 'info')" />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Tab Switching
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const panels = document.querySelectorAll('.tab-panel');
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Remove active and add standard styles
+      tabBtns.forEach(b => {
+        b.classList.remove('active');
+        b.style.borderBottom = 'none';
+        b.style.fontWeight = 'normal';
+      });
+      panels.forEach(p => p.classList.add('hidden'));
+
+      // Make active
+      btn.classList.add('active');
+      btn.style.borderBottom = '3px solid var(--primary)';
+      btn.style.fontWeight = '700';
+
+      const tabId = btn.getAttribute('data-tab');
+      document.getElementById(tabId).classList.remove('hidden');
+    });
+  });
+
+  // Password Toggles
+  bindPwToggle('pw-toggle-new', 'new-pw');
+  bindPwToggle('pw-toggle-confirm', 'confirm-pw');
+
+  function bindPwToggle(btnId, inputId) {
+    const btn = document.getElementById(btnId);
+    const input = document.getElementById(inputId);
+    if (btn && input) {
+      btn.addEventListener('click', () => {
+        const isPass = input.type === 'password';
+        input.type = isPass ? 'text' : 'password';
+        btn.textContent = isPass ? '🙈' : '👁️';
+      });
+    }
+  }
+
+  // Password confirmation check
+  const secForm = document.getElementById('securityForm');
+  secForm.addEventListener('submit', (e) => {
+    const newPw = document.getElementById('new-pw').value;
+    const confPw = document.getElementById('confirm-pw').value;
+    
+    if (newPw !== confPw) {
+      e.preventDefault();
+      showToast('Passwords do not match.', 'error');
+      return;
+    }
+    
+    const saveSecBtn = document.getElementById('saveSecBtn');
+    saveSecBtn.textContent = 'Updating Password…';
+    saveSecBtn.disabled = true;
+  });
+
+  // Submit button loader for profile
+  const profForm = document.getElementById('profileForm');
+  profForm.addEventListener('submit', () => {
+    const saveProfileBtn = document.getElementById('saveProfileBtn');
+    saveProfileBtn.textContent = 'Saving Details…';
+    saveProfileBtn.disabled = true;
+  });
+});
+</script>
+{% endblock %}
