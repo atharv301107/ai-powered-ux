@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% block title %}My Appointments{% endblock %}
+{% block page_title %}My Appointments{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;" class="reveal">
+  <div>
+    <h2 style="font-family:var(--font-head);font-weight:800;color:var(--text-heading);margin-bottom:4px;">My Appointments</h2>
+    <p style="color:var(--text-sub);font-size:13.5px;margin-bottom:0;">View your consult schedule histories and book new doctor slots.</p>
+  </div>
+  <button class="btn btn-primary" onclick="openModal('appt-modal')"><i class="fa-solid fa-plus"></i> Book Appointment</button>
+</div>
+
+<!-- Search Bar & Stats Card -->
+<div class="content-card reveal" style="padding:20px;margin-bottom:24px;">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
+    <div style="flex:1;min-width:240px;">
+      <div class="input-icon-wrap">
+        <span class="input-prefix">🔍</span>
+        <input type="text" id="appt-search" class="form-control" placeholder="Search by doctor or status…" oninput="filterTable()" />
+      </div>
+    </div>
+    
+    <div style="display:flex;gap:12px;font-size:13.5px;font-weight:700;">
+      <div style="background:var(--info-light);color:var(--primary);padding:8px 16px;border-radius:24px;">
+        Upcoming Slots
+      </div>
+      <div style="background:var(--success-light);color:#15803d;padding:8px 16px;border-radius:24px;">
+        Completed Consults
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Appointments Table Card -->
+<div class="content-card reveal" style="padding:24px;margin-bottom:40px;">
+  <div class="table-wrapper">
+    <table class="data-table" id="appointments-table">
+      <thead>
+        <tr>
+          <th style="width:50px;">#</th>
+          <th>Clinician Name</th>
+          <th>Scheduled Date</th>
+          <th>Specialty Dept</th>
+          <th>Consult Status</th>
+          <th style="text-align:right;width:120px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in appointments %}
+        <tr class="appt-row">
+          <td>{{ loop.index }}</td>
+          <td>
+            <div style="font-weight:700;color:var(--text-heading);">{{ a.doctor_name }}</div>
+          </td>
+          <td style="font-size:12.5px;color:var(--text-sub);">
+            <span>📅 {{ a.appointment_date }}</span> <span style="display:block;font-size:11px;opacity:.8;">🕒 {{ a.time }}</span>
+          </td>
+          <td>
+            <span class="badge badge-neutral" style="text-transform:capitalize;">{{ a.department }}</span>
+          </td>
+          <td>
+            <span class="status-badge status-{{ a.status|lower }}">{{ a.status }}</span>
+          </td>
+          <td style="text-align:right;">
+            {% if a.status == 'Upcoming' or a.status == 'Pending' %}
+            <form method="POST" action="{{ url_for('delete_appointment', appointment_id=a.id) }}" onsubmit="return confirm('Are you sure you want to cancel this booking?')" style="display:inline;">
+              <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--danger);border:1px solid var(--border);padding:6px 12px;font-size:12px;"><i class="fa-solid fa-xmark"></i> Cancel</button>
+            </form>
+            {% else %}
+            <span style="font-size:12px;color:var(--text-muted);font-weight:500;">No Action</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);">
+            No appointments booked yet. Click "Book Appointment" to schedule one.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal: Appointment Booking -->
+<div class="modal-overlay" id="appt-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>📅 Book Consultation</h3>
+      <button class="modal-close" onclick="closeModal('appt-modal')">✕</button>
+    </div>
+    <form method="POST" action="{{ url_for('patient_appointments') }}">
+      <div class="modal-body">
+        <input type="hidden" name="patient_name" value="{{ session.get('user_name','') }}" />
+        
+        <div class="form-group" style="margin-bottom:14px;">
+          <label class="form-label" for="doctor_name">Choose Doctor</label>
+          <select id="doctor_name" name="doctor_name" class="form-control" required>
+            <option value="" disabled selected>Select doctor</option>
+            <option value="Dr. Sneha Patil">Dr. Sneha Patil (Cardiology)</option>
+            <option value="Dr. Mehta">Dr. Mehta (Dental)</option>
+            <option value="Dr. Khan">Dr. Khan (Orthopedic)</option>
+            <option value="Dr. Patil">Dr. Patil (General)</option>
+          </select>
+        </div>
+        
+        <div class="form-row" style="margin-bottom:14px;">
+          <div class="form-group">
+            <label class="form-label" for="appointment_date">Date</label>
+            <input type="date" id="appointment_date" name="appointment_date" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="time">Time Slot</label>
+            <input type="text" id="time" name="time" class="form-control" placeholder="e.g. 10:30 AM" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="department">Specialty Department</label>
+          <select id="department" name="department" class="form-control" required>
+            <option value="Cardiology">Cardiology</option>
+            <option value="Dental">Dental</option>
+            <option value="Orthopedic">Orthopedic</option>
+            <option value="General">General</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('appt-modal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Book Consultation</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+window.openModal = function(id) {
+  const modal = document.getElementById(id);
+  if (modal) modal.classList.add('open');
+};
+
+window.closeModal = function(id) {
+  const modal = document.getElementById(id);
+  if (modal) modal.classList.remove('open');
+};
+
+function filterTable() {
+  const query = document.getElementById('appt-search').value.toLowerCase();
+  const rows = document.querySelectorAll('.appt-row');
+  
+  rows.forEach(row => {
+    const text = row.textContent.toLowerCase();
+    if (text.includes(query)) {
+      row.style.display = '';
+    } else {
+      row.style.display = 'none';
+    }
+  });
+}
+</script>
+{% endblock %}

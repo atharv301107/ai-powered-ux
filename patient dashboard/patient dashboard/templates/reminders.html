@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Medicine Reminders | MediCare</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🏥</div>
+    <h2>MediCare</h2>
+    <span>Patient Portal</span>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-label">Main</div>
+    <a href="/" class="nav-link"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a href="/appointments" class="nav-link"><span class="nav-icon">📅</span> Appointments</a>
+    <a href="/reminders" class="nav-link active"><span class="nav-icon">💊</span> Medicine Reminders</a>
+    <div class="nav-label">Health</div>
+    <a href="#" class="nav-link"><span class="nav-icon">📋</span> Medical Records</a>
+    <a href="#" class="nav-link"><span class="nav-icon">📊</span> Health Reports</a>
+    <div class="nav-label">Account</div>
+    <a href="#" class="nav-link"><span class="nav-icon">⚙️</span> Settings</a>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar" id="sidebar-avatar">?</div>
+      <div class="user-info">
+        <div class="name" data-auth-name>Loading...</div>
+        <div class="role" data-auth-role>Patient</div>
+      </div>
+    </div>
+    <button data-logout style="margin-top:10px;width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#a8b8cc;font-size:12px;cursor:pointer;">
+      🚪 Logout
+    </button>
+  </div>
+</aside>
+
+<div class="main-wrap">
+  <header class="topbar">
+    <span class="topbar-title">Medicine Reminders <span>Never miss a dose</span></span>
+    <div class="topbar-actions">
+      <span style="font-size:13px;color:var(--text-sub);font-weight:600;" id="live-clock"></span>
+      <button class="topbar-btn">🔔<span class="notif-dot"></span></button>
+    </div>
+  </header>
+
+  <main class="page-content">
+
+    <!-- Hero -->
+    <div class="page-hero" style="background:linear-gradient(135deg,#1e1b4b,#4338ca);">
+      <div>
+        <h1>Medicine Reminders</h1>
+        <p>Set timely reminders and stay on top of your medication schedule.</p>
+        <div style="margin-top:16px;">
+          <button class="btn btn-primary" data-modal-open="reminder-modal">
+            + Add Reminder
+          </button>
+        </div>
+      </div>
+      <div class="page-hero-icon">💊</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid" style="margin-bottom:24px;">
+      <div class="stat-card">
+        <div class="stat-icon indigo">💊</div>
+        <div>
+          <div class="stat-value">{{ reminders | length }}</div>
+          <div class="stat-label">Total Medicines</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">🔔</div>
+        <div>
+          <div class="stat-value">{{ reminders | selectattr('active') | list | length }}</div>
+          <div class="stat-label">Active Reminders</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon amber">⏸️</div>
+        <div>
+          <div class="stat-value">{{ reminders | rejectattr('active') | list | length }}</div>
+          <div class="stat-label">Paused</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon teal">📆</div>
+        <div>
+          <div class="stat-value">{{ reminders | selectattr('frequency', 'eq', 'Daily') | list | length }}</div>
+          <div class="stat-label">Daily Medicines</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reminders List + Tips -->
+    <div class="grid-3-1">
+
+      <!-- Reminders List -->
+      <div class="card">
+        <div class="card-header">
+          <h3>💊 All Medicine Reminders</h3>
+          <button class="btn btn-primary btn-sm" data-modal-open="reminder-modal">+ Add</button>
+        </div>
+
+        {% if reminders %}
+          {% for r in reminders %}
+          <div class="reminder-card-full" style="{% if not r.active %}opacity:0.55;{% endif %}">
+            <div class="pill-icon-lg">💊</div>
+            <div class="reminder-details">
+              <div class="med">{{ r.medicine }}</div>
+              <div class="freq">
+                🔁 {{ r.frequency }}
+                {% if r.active %}
+                  &nbsp;·&nbsp; <span style="color:var(--success);font-weight:600;">● Active</span>
+                {% else %}
+                  &nbsp;·&nbsp; <span style="color:var(--text-sub);font-weight:600;">Paused</span>
+                {% endif %}
+              </div>
+            </div>
+            <div class="reminder-time">{{ r.time }}</div>
+            <label class="toggle-switch" style="margin-left:14px;">
+              <input type="checkbox" class="reminder-toggle" data-id="{{ r.id }}" {% if r.active %}checked{% endif %}>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty-state">
+            <div class="icon">💊</div>
+            <p>No reminders yet.<br>Add your first medicine reminder!</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Tips Panel -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+
+        <!-- Today's Schedule -->
+        <div class="card">
+          <div class="card-header"><h3>🕐 Today's Schedule</h3></div>
+          <div class="card-body" style="padding:12px 20px;">
+            {% set active_reminders = reminders | selectattr('active') | list | sort(attribute='time') %}
+            {% if active_reminders %}
+              {% for r in active_reminders %}
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);">
+                <div style="font-family:var(--mono);font-size:13px;font-weight:700;color:var(--primary-dark);min-width:70px;">{{ r.time }}</div>
+                <div style="font-size:13px;font-weight:600;">{{ r.medicine.split(' ')[0] }}</div>
+              </div>
+              {% endfor %}
+            {% else %}
+              <p style="color:var(--text-sub);font-size:13px;text-align:center;padding:16px 0;">No active reminders</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Tips -->
+        <div class="card">
+          <div class="card-header"><h3>💡 Medicine Tips</h3></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div style="display:flex;gap:10px;align-items:flex-start;">
+                <span style="font-size:20px;">🥛</span>
+                <div>
+                  <div style="font-weight:600;font-size:13px;">Take with water</div>
+                  <div style="color:var(--text-sub);font-size:12px;">Most medicines work best taken with a full glass of water.</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;align-items:flex-start;">
+                <span style="font-size:20px;">⏰</span>
+                <div>
+                  <div style="font-weight:600;font-size:13px;">Consistent timing</div>
+                  <div style="color:var(--text-sub);font-size:12px;">Take medicines at the same time each day for best results.</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;align-items:flex-start;">
+                <span style="font-size:20px;">🚫</span>
+                <div>
+                  <div style="font-weight:600;font-size:13px;">Don't skip doses</div>
+                  <div style="color:var(--text-sub);font-size:12px;">Missing doses can reduce effectiveness. Set reminders!</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;align-items:flex-start;">
+                <span style="font-size:20px;">👨‍⚕️</span>
+                <div>
+                  <div style="font-weight:600;font-size:13px;">Consult your doctor</div>
+                  <div style="color:var(--text-sub);font-size:12px;">Never stop medication without consulting your doctor first.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ADD REMINDER MODAL -->
+<div class="modal-overlay" id="reminder-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>💊 Add Medicine Reminder</h3>
+      <button class="modal-close" data-modal-close>✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="reminder-form" style="display:flex;flex-direction:column;gap:16px;">
+        <div class="form-group">
+          <label class="form-label">Medicine Name</label>
+          <input type="text" class="form-input" id="medicine-name" placeholder="e.g. Paracetamol 500mg" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Reminder Time</label>
+          <input type="time" class="form-input" id="reminder-time" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Frequency</label>
+          <select class="form-select" id="reminder-freq" required>
+            <option value="Daily">Daily</option>
+            <option value="Weekly">Weekly</option>
+            <option value="Twice a day">Twice a day</option>
+            <option value="Every 8 hours">Every 8 hours</option>
+            <option value="Monthly">Monthly</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes (optional)</label>
+          <input type="text" class="form-input" placeholder="e.g. Take after meals" />
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" data-modal-close>Cancel</button>
+      <button type="submit" form="reminder-form" class="btn btn-primary">Add Reminder</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container"></div>
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

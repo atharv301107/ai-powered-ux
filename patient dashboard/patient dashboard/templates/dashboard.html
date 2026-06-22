@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Patient Dashboard | MediCare</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+
+<!-- ============ SIDEBAR ============ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🏥</div>
+    <h2>MediCare</h2>
+    <span>Patient Portal</span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-label">Main</div>
+    <a href="/" class="nav-link active">
+      <span class="nav-icon">🏠</span> Dashboard
+    </a>
+    <a href="/appointments" class="nav-link">
+      <span class="nav-icon">📅</span> Appointments
+      <span class="nav-badge">{{ appointments | selectattr('status', 'eq', 'upcoming') | list | length }}</span>
+    </a>
+    <a href="/reminders" class="nav-link">
+      <span class="nav-icon">💊</span> Medicine Reminders
+    </a>
+
+    <div class="nav-label">Health</div>
+    <a href="#" class="nav-link">
+      <span class="nav-icon">📋</span> Medical Records
+    </a>
+    <a href="#" class="nav-link">
+      <span class="nav-icon">📊</span> Health Reports
+    </a>
+
+    <div class="nav-label">Account</div>
+    <a href="#" class="nav-link">
+      <span class="nav-icon">⚙️</span> Settings
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar" id="sidebar-avatar">?</div>
+      <div class="user-info">
+        <div class="name" data-auth-name>Loading...</div>
+        <div class="role" data-auth-role>Patient</div>
+      </div>
+    </div>
+    <button data-logout style="margin-top:10px;width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#a8b8cc;font-size:12px;cursor:pointer;">
+      🚪 Logout
+    </button>
+  </div>
+</aside>
+
+<!-- ============ MAIN WRAP ============ -->
+<div class="main-wrap">
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <span class="topbar-title">Dashboard <span>Overview</span></span>
+    <div class="topbar-actions">
+      <span style="font-size:13px;color:var(--text-sub);font-weight:600;" id="live-clock"></span>
+      <button class="topbar-btn" title="Notifications">
+        🔔
+        <span class="notif-dot"></span>
+      </button>
+      <button class="topbar-btn" title="Profile">👤</button>
+    </div>
+  </header>
+
+  <!-- Page Content -->
+  <main class="page-content">
+
+    <!-- ---- PROFILE HERO ---- -->
+    <div class="profile-hero">
+      <div class="profile-avatar-lg">{{ patient.name[0] }}</div>
+      <div class="profile-info">
+        <h2>Welcome back, <span data-auth-name>there</span>! 👋</h2>
+        <p>{{ patient.email }} &nbsp;·&nbsp; {{ patient.phone }}</p>
+        <div class="profile-tags">
+          <span class="profile-tag">🩸 {{ patient.blood_group }}</span>
+          <span class="profile-tag">👤 Age {{ patient.age }}</span>
+          <span class="profile-tag">🏥 {{ patient.doctor }}</span>
+          <span class="profile-tag">📍 {{ patient.address }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---- STATS ---- -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon teal">📅</div>
+        <div>
+          <div class="stat-value" data-count="{{ appointments | selectattr('status', 'eq', 'upcoming') | list | length }}">
+            {{ appointments | selectattr('status', 'eq', 'upcoming') | list | length }}
+          </div>
+          <div class="stat-label">Upcoming Appointments</div>
+          <div class="stat-change up">↑ Scheduled</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">✅</div>
+        <div>
+          <div class="stat-value" data-count="{{ appointments | selectattr('status', 'eq', 'completed') | list | length }}">
+            {{ appointments | selectattr('status', 'eq', 'completed') | list | length }}
+          </div>
+          <div class="stat-label">Completed Visits</div>
+          <div class="stat-change up">This year</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon indigo">💊</div>
+        <div>
+          <div class="stat-value" data-count="{{ reminders | selectattr('active') | list | length }}">
+            {{ reminders | selectattr('active') | list | length }}
+          </div>
+          <div class="stat-label">Active Reminders</div>
+          <div class="stat-change neutral">Running today</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon amber">📋</div>
+        <div>
+          <div class="stat-value" data-count="{{ patient.medical_records | length }}">
+            {{ patient.medical_records | length }}
+          </div>
+          <div class="stat-label">Medical Records</div>
+          <div class="stat-change neutral">On file</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---- APPOINTMENTS + REMINDERS ROW ---- -->
+    <div class="grid-2">
+
+      <!-- Upcoming Appointments -->
+      <div class="card">
+        <div class="card-header">
+          <h3>📅 Upcoming Appointments</h3>
+          <a href="/appointments" class="btn btn-outline btn-sm">View All</a>
+        </div>
+        <div class="card-body" style="padding:0 22px;">
+          {% set upcoming = appointments | selectattr('status', 'eq', 'upcoming') | list %}
+          {% if upcoming %}
+            {% for appt in upcoming %}
+            {% set parts = appt.date.split('-') %}
+            <div class="appt-mini">
+              <div class="appt-date-box">
+                <div class="day">{{ parts[2] }}</div>
+                <div class="mon">{{ ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parts[1]|int - 1] }}</div>
+              </div>
+              <div class="appt-info" style="flex:1;">
+                <div class="doctor-name">{{ appt.doctor }}</div>
+                <div class="appt-meta">{{ appt.specialty }} · {{ appt.time }}</div>
+              </div>
+              <span class="status-pill upcoming">Upcoming</span>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="empty-state">
+              <div class="icon">📅</div>
+              <p>No upcoming appointments.<br>Book one now!</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Medicine Reminders -->
+      <div class="card">
+        <div class="card-header">
+          <h3>💊 Medicine Reminders</h3>
+          <a href="/reminders" class="btn btn-outline btn-sm">Manage</a>
+        </div>
+        <div class="card-body" style="padding:0 22px;">
+          {% for r in reminders %}
+          <div class="reminder-mini">
+            <div class="pill-icon">💊</div>
+            <div style="flex:1;">
+              <div class="med-name">{{ r.medicine }}</div>
+              <div class="med-time">{{ r.time }} · {{ r.frequency }}</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" class="reminder-toggle" data-id="{{ r.id }}" {% if r.active %}checked{% endif %}>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ---- MEDICAL RECORDS ---- -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <h3>📋 Medical Records</h3>
+        </div>
+        <button class="btn btn-primary btn-sm">+ Add Record</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="records-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Diagnosis</th>
+              <th>Doctor</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for record in patient.medical_records %}
+            <tr>
+              <td style="font-family:var(--mono); font-size:13px;">{{ record.date }}</td>
+              <td><span class="diagnosis-badge">{{ record.diagnosis }}</span></td>
+              <td>{{ record.doctor }}</td>
+              <td style="color:var(--text-sub); font-size:13px;">{{ record.notes }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ---- PERSONAL INFO ---- -->
+    <div style="margin-top:24px;">
+      <div class="card">
+        <div class="card-header">
+          <h3>👤 Personal Information</h3>
+          <button class="btn btn-outline btn-sm">✏️ Edit</button>
+        </div>
+        <div class="card-body">
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Full Name</label>
+              <span>{{ patient.name }}</span>
+            </div>
+            <div class="info-item">
+              <label>Age</label>
+              <span>{{ patient.age }} years</span>
+            </div>
+            <div class="info-item">
+              <label>Blood Group</label>
+              <span>{{ patient.blood_group }}</span>
+            </div>
+            <div class="info-item">
+              <label>Phone</label>
+              <span>{{ patient.phone }}</span>
+            </div>
+            <div class="info-item">
+              <label>Email</label>
+              <span>{{ patient.email }}</span>
+            </div>
+            <div class="info-item">
+              <label>Primary Doctor</label>
+              <span>{{ patient.doctor }}</span>
+            </div>
+            <div class="info-item" style="grid-column:1/-1">
+              <label>Address</label>
+              <span>{{ patient.address }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast-container"></div>
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

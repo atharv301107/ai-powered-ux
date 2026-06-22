@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% block title %}Hospital Health Statistics{% endblock %}
+{% block page_title %}Health Stats{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div style="margin-bottom:24px;" class="reveal">
+  <h2 style="font-family:var(--font-head);font-weight:800;color:var(--text-heading);margin-bottom:4px;">Hospital Health Statistics</h2>
+  <p style="color:var(--text-sub);font-size:13.5px;margin-bottom:0;">Log hospital metrics and observe daily registration trends.</p>
+</div>
+
+<!-- Form & Chart Row -->
+<div class="grid-2 reveal" style="margin-bottom:28px;">
+  <!-- Add Daily Stats -->
+  <div class="content-card">
+    <h4 style="font-family:var(--font-head);font-weight:800;color:var(--text-heading);margin-bottom:16px;">📈 Add Daily Entry</h4>
+    <form method="POST" action="{{ url_for('health_stats') }}" autocomplete="off" id="statsForm">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+        <div class="form-group" style="grid-column: span 2;">
+          <label class="form-label" for="stat_date">Date</label>
+          <input type="date" id="stat_date" name="stat_date" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="patients_count">Patients Registered</label>
+          <input type="number" id="patients_count" name="patients_count" class="form-control" placeholder="e.g. 150" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="doctors_count">Doctors Active</label>
+          <input type="number" id="doctors_count" name="doctors_count" class="form-control" placeholder="e.g. 20" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="appointments_count">Appointments Booked</label>
+          <input type="number" id="appointments_count" name="appointments_count" class="form-control" placeholder="e.g. 65" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="emergency_cases">Emergency Cases</label>
+          <input type="number" id="emergency_cases" name="emergency_cases" class="form-control" placeholder="e.g. 8" required />
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;" id="saveBtn">Log Daily Metrics</button>
+    </form>
+  </div>
+
+  <!-- Realtime Analytics Chart -->
+  <div class="content-card">
+    <h4 style="font-family:var(--font-head);font-weight:800;color:var(--text-heading);margin-bottom:16px;">📊 Metric Log Visualization</h4>
+    <div style="height:240px;">
+      <canvas id="healthTrendChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- History Log Card -->
+<div class="content-card reveal" style="padding:24px;margin-bottom:40px;">
+  <h4 style="font-family:var(--font-head);font-weight:800;color:var(--text-heading);margin-bottom:14px;">📋 Historical Metric Entries</h4>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Log Date</th>
+          <th>Patients</th>
+          <th>Active Doctors</th>
+          <th>Appointments</th>
+          <th>Emergency Cases</th>
+          <th style="text-align:right;width:100px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in stats %}
+        <tr>
+          <td style="font-weight:700;color:var(--text-heading);">{{ s.stat_date }}</td>
+          <td>{{ s.patients_count }}</td>
+          <td>{{ s.doctors_count }}</td>
+          <td>{{ s.appointments_count }}</td>
+          <td><span class="badge badge-danger" style="font-size:12px;">{{ s.emergency_cases }} Cases</span></td>
+          <td style="text-align:right;">
+            <form method="POST" action="{{ url_for('delete_health_stat', stat_id=s.id) }}" onsubmit="return confirm('Are you sure you want to delete this log entry?')" style="display:inline;">
+              <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--danger);border:1px solid var(--border);padding:6px 12px;font-size:12px;"><i class="fa-solid fa-trash"></i> Delete</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Parse stats variable from Jinja2 context safely using tojson
+  const statsData = {{ stats|tojson }};
+  
+  if (statsData.length === 0) return;
+
+  const dates = statsData.map(item => item.stat_date);
+  const patients = statsData.map(item => item.patients_count);
+  const appointments = statsData.map(item => item.appointments_count);
+  const emergencies = statsData.map(item => item.emergency_cases);
+
+  const ctx = document.getElementById('healthTrendChart').getContext('2d');
+  
+  const pGradient = ctx.createLinearGradient(0, 0, 0, 200);
+  pGradient.addColorStop(0, 'rgba(37, 99, 235, 0.25)');
+  pGradient.addColorStop(1, 'rgba(37, 99, 235, 0)');
+
+  const eGradient = ctx.createLinearGradient(0, 0, 0, 200);
+  eGradient.addColorStop(0, 'rgba(239, 68, 68, 0.2)');
+  eGradient.addColorStop(1, 'rgba(239, 68, 68, 0)');
+
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: dates,
+      datasets: [
+        {
+          label: 'Patients Registered',
+          data: patients,
+          borderColor: '#2563eb',
+          backgroundColor: pGradient,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointBackgroundColor: '#2563eb',
+          borderWidth: 2
+        },
+        {
+          label: 'Appointments',
+          data: appointments,
+          borderColor: '#14b8a6',
+          fill: false,
+          tension: 0.4,
+          pointRadius: 4,
+          pointBackgroundColor: '#14b8a6',
+          borderWidth: 2
+        },
+        {
+          label: 'Emergency Cases',
+          data: emergencies,
+          borderColor: '#ef4444',
+          backgroundColor: eGradient,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointBackgroundColor: '#ef4444',
+          borderWidth: 2
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }
+      },
+      scales: {
+        y: { beginAtZero: true, grid: { color: 'rgba(226, 232, 240, 0.4)' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // Submit button loading state
+  const form = document.getElementById('statsForm');
+  form.addEventListener('submit', () => {
+    const saveBtn = document.getElementById('saveBtn');
+    saveBtn.textContent = 'Logging Entry…';
+    saveBtn.disabled = true;
+  });
+});
+</script>
+{% endblock %}

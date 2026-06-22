@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: smartcare-hospital
+    env: python
+    buildCommand: "pip install -r healthcare_app/requirements.txt"
+    startCommand: "gunicorn --bind 0.0.0.0:$PORT --chdir healthcare_app app:app"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: GEMINI_API_KEY
+        sync: false

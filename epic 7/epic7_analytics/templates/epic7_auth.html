@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Epic 7: Health Prediction & Analytics</title>
+    <link rel="stylesheet" href="{{ url_for('epic7_analytics.static', filename='css/epic7_analytics.css') }}" />
+    <!-- Fallback raw routing for simplicity -->
+    <link rel="stylesheet" href="/epic7_analytics/static/css/epic7_analytics.css" />
+</head>
+<body>
+    <div class="epic-container">
+        <div class="epic-header">
+            <h1>Epic 7: Health Prediction & Analytics</h1>
+            <p class="epic-owner">Product Owner: <strong>Sanskar Atpadkar</strong></p>
+        </div>
+        <p>Health Risk analysis engine along with personalized wellness visualization trends.</p>
+        
+        <div class="feature-box">
+            <h3>Interactive Testing Sandbox</h3>
+            <p>Click the action indicator below to trigger this module's dedicated Python endpoint framework asynchronously.</p>
+            <button class="btn-action" onclick="testModuleRoute()">Fire Endpoint Simulation</button>
+        </div>
+        
+        <p style="margin-top: 30px;"><a href="/">← Return to Main UI Integration Matrix (Epic 8)</a></p>
+    </div>
+
+    <script src="/epic7_analytics/static/js/epic7_analytics.js"></script>
+    <script>
+        function testModuleRoute() {
+            // Custom dynamic endpoint execution targeting this module specifically
+            let sampleEndpoints = {
+                'epic1_auth': '/register',
+                'epic2_patient': '/book-appointment',
+                'epic3_doctor': '/prescription/upload',
+                'epic4_admin': '/admin/users/manage',
+                'epic5_chatbot': '/chatbot/message',
+                'epic6_ocr': '/ocr/process',
+                'epic7_analytics': '/analytics/predict',
+                'epic8_ui_integration': '/'
+            };
+            let target = sampleEndpoints['epic7_analytics'];
+            executeEpicAction(target, { "testData": "Portal Context Handshake" });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Your Account | SmartCare Multi-Speciality Hospital</title>
+  <meta name="description" content="Register a secure patient account with SmartCare Hospital." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  
+  <style>
+    /* Full height split screen */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #F8FAFC;
+      overflow: hidden;
+    }
+
+    .auth-container {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Left Pane: Branding and Illustration */
+    .auth-left {
+      flex: 1.2;
+      background: linear-gradient(135deg, #1E3A8A 0%, #0F172A 50%, #0D9488 100%);
+      color: #FFFFFF;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 48px;
+      overflow: hidden;
+    }
+
+    /* Floating background elements */
+    .floating-circle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(20, 184, 166, 0.15);
+      filter: blur(40px);
+      pointer-events: none;
+      animation: float-slow 10s ease-in-out infinite;
+    }
+    .circle-1 { width: 350px; height: 350px; top: -100px; left: -100px; }
+    .circle-2 { width: 300px; height: 300px; bottom: -50px; right: -50px; background: rgba(37, 99, 235, 0.12); }
+    .circle-3 { width: 200px; height: 200px; top: 40%; left: 30%; background: rgba(139, 92, 246, 0.1); }
+
+    @keyframes float-slow {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-20px) scale(1.05); }
+    }
+
+    .brand-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 10;
+    }
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #2563EB, #14B8A6);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+    }
+    .brand-name {
+      font-family: 'Poppins', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .illustration-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      margin: 40px 0;
+    }
+
+    .pulse-svg {
+      width: 80%;
+      max-width: 340px;
+      filter: drop-shadow(0 15px 30px rgba(0,0,0,0.3));
+      animation: heartbeat 2.5s ease-in-out infinite;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      25% { transform: scale(1.02); }
+      35% { transform: scale(1.01); }
+      45% { transform: scale(1.03); }
+    }
+
+    .brand-footer {
+      z-index: 10;
+      max-width: 480px;
+    }
+    .brand-footer h2 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 12px;
+    }
+    .brand-footer p {
+      font-size: 14.5px;
+      color: rgba(255, 255, 255, 0.75);
+      line-height: 1.6;
+    }
+
+    /* Right Pane: Form Area with scroll support */
+    .auth-right {
+      flex: 0.9;
+      background-color: #F8FAFC;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px;
+      position: relative;
+      overflow-y: auto;
+      height: 100vh;
+      box-sizing: border-box;
+    }
+
+    .form-card {
+      width: 100%;
+      max-width: 460px;
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
+      animation: fade-in-up 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      margin: auto 0;
+      box-sizing: border-box;
+    }
+
+    @keyframes fade-in-up {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-header {
+      margin-bottom: 24px;
+    }
+    .form-header h2 {
+      font-family: 'Poppins', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      color: #0F172A;
+      margin: 0 0 8px 0;
+    }
+    .form-header p {
+      font-size: 14px;
+      color: #64748B;
+      margin: 0;
+    }
+
+    /* Floating Labels Styling */
+    .form-group-floating {
+      position: relative;
+      margin-bottom: 18px;
+    }
+    .floating-input {
+      width: 100%;
+      height: 52px;
+      padding: 20px 16px 4px;
+      font-size: 13.5px;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      background: #F8FAFC;
+      color: #0F172A;
+      outline: none;
+      transition: all 0.25s ease;
+      box-sizing: border-box;
+    }
+    .floating-input:focus {
+      border-color: #2563EB;
+      background: #FFFFFF;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+    }
+    .floating-label {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94A3B8;
+      font-size: 13.5px;
+      transition: all 0.2s ease;
+      pointer-events: none;
+      background: transparent;
+    }
+    /* Float when input has focus, is not empty, or is date type */
+    .floating-input:focus ~ .floating-label,
+    .floating-input:not(:placeholder-shown) ~ .floating-label,
+    .floating-input[type="date"] ~ .floating-label {
+      top: 12px;
+      font-size: 10px;
+      color: #2563EB;
+      font-weight: 600;
+    }
+
+    .form-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    /* Password Strength styling */
+    .strength-container {
+      margin-top: -12px;
+      margin-bottom: 14px;
+    }
+    .strength-bar-track {
+      width: 100%;
+      height: 4px;
+      background-color: #E2E8F0;
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+    .strength-bar-fill {
+      height: 100%;
+      width: 0;
+      background-color: #EF4444;
+      transition: width 0.3s ease, background-color 0.3s ease;
+    }
+    .strength-text {
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748B;
+    }
+
+    /* Confirm Match Label */
+    .match-text {
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: -12px;
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    /* Checkbox & Terms */
+    .terms-container {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 22px;
+      font-size: 12.5px;
+      color: #64748B;
+      line-height: 1.4;
+    }
+    .terms-container input {
+      margin-top: 2px;
+      width: 16px;
+      height: 16px;
+      accent-color: #2563EB;
+      cursor: pointer;
+    }
+    .terms-container a {
+      color: #2563EB;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .terms-container a:hover {
+      text-decoration: underline;
+    }
+
+    .btn-submit {
+      width: 100%;
+      height: 48px;
+      background: linear-gradient(135deg, #2563EB, #1D4ED8);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+      transition: all 0.2s ease;
+    }
+    .btn-submit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+    }
+    .btn-submit:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: #FFFFFF;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .form-footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 13.5px;
+      color: #64748B;
+    }
+    .form-footer a {
+      color: #2563EB;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .form-footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Flash alerts inside card */
+    .card-alert {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      border: 1px solid transparent;
+    }
+    .card-alert-danger {
+      background-color: #FEF2F2;
+      color: #991B1B;
+      border-color: #FEE2E2;
+    }
+    .alert-dismiss {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      opacity: 0.6;
+      font-size: 14px;
+      padding: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .auth-left { display: none; }
+      .auth-right { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="auth-container">
+  
+  <!-- LEFT: Branding & Animated Healthcare SVGs -->
+  <div class="auth-left">
+    <!-- Floating Background Particles -->
+    <div class="floating-circle circle-1"></div>
+    <div class="floating-circle circle-2"></div>
+    <div class="floating-circle circle-3"></div>
+
+    <div class="brand-header">
+      <div class="brand-logo">🏥</div>
+      <div class="brand-name">SmartCare</div>
+    </div>
+
+    <div class="illustration-container">
+      <!-- Premium Inline SVG Medical Heartbeat Shield Illustration -->
+      <svg class="pulse-svg" viewBox="0 0 340 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Shield Base -->
+        <path d="M170 30L290 80V170C290 240 240 285 170 305C100 285 50 240 50 170V80L170 30Z" fill="rgba(255, 255, 255, 0.05)" stroke="rgba(255, 255, 255, 0.15)" stroke-width="2.5"/>
+        
+        <!-- Medical Cross in Center -->
+        <rect x="156" y="100" width="28" height="80" rx="4" fill="#14B8A6" fill-opacity="0.8"/>
+        <rect x="130" y="126" width="80" height="28" rx="4" fill="#14B8A6" fill-opacity="0.8"/>
+        
+        <!-- Heartbeat signal overlay -->
+        <path d="M70 200H130L145 170L165 240L185 180L195 210L210 200H270" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        
+        <!-- Subtle details -->
+        <circle cx="170" cy="55" r="4" fill="#2563EB"/>
+        <circle cx="90" cy="110" r="3" fill="rgba(255,255,255,0.3)"/>
+        <circle cx="250" cy="110" r="3" fill="rgba(255,255,255,0.3)"/>
+      </svg>
+    </div>
+
+    <div class="brand-footer">
+      <h2>SmartCare Portal</h2>
+      <p>Secure clinical management portal for SmartCare Multi-Speciality Hospital. Connect instantly with practitioner records, schedules, and analytics.</p>
+    </div>
+  </div>
+
+  <!-- RIGHT: Secure Registration Form -->
+  <div class="auth-right">
+    <div class="form-card">
+      <div class="form-header">
+        <h2>Create Your Account</h2>
+        <p>Join our healthcare platform</p>
+      </div>
+
+      <!-- Flash Messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+          <div class="card-alert card-alert-danger">
+            <span>🚨</span>
+            <span>{{ message }}</span>
+            <button type="button" class="alert-dismiss" onclick="this.parentElement.remove()">✕</button>
+          </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form id="signup-form" method="POST" action="{{ url_for('signup') }}" autocomplete="off">
+        
+        <!-- Full Name -->
+        <div class="form-group-floating">
+          <input type="text" id="name" name="name" class="floating-input"
+                 placeholder=" " required />
+          <label class="floating-label" for="name">Full Name</label>
+        </div>
+
+        <div class="form-row-2">
+          <!-- Email Address -->
+          <div class="form-group-floating">
+            <input type="email" id="email" name="email" class="floating-input"
+                   placeholder=" " required autocomplete="email" />
+            <label class="floating-label" for="email">Email Address</label>
+          </div>
+
+          <!-- Mobile Number -->
+          <div class="form-group-floating">
+            <input type="tel" id="phone" name="phone" class="floating-input"
+                   placeholder=" " required />
+            <label class="floating-label" for="phone">Mobile Number</label>
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <!-- Date of Birth -->
+          <div class="form-group-floating">
+            <input type="date" id="dob" name="dob" class="floating-input"
+                   placeholder=" " required style="padding-top: 18px;" />
+            <label class="floating-label" for="dob">Date of Birth</label>
+          </div>
+
+          <!-- Gender Dropdown -->
+          <div class="form-group-floating">
+            <select id="gender" name="gender" class="floating-input" required style="padding-top: 18px; cursor: pointer;">
+              <option value="" disabled selected></option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+            <label class="floating-label" for="gender">Gender</label>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group-floating" style="margin-bottom: 14px;">
+          <input type="password" id="password" name="password" class="floating-input"
+                 placeholder=" " required autocomplete="new-password" />
+          <label class="floating-label" for="password">Choose Password</label>
+        </div>
+
+        <!-- Password Strength Meter -->
+        <div class="strength-container" id="strength-container" style="display: none;">
+          <div class="strength-bar-track">
+            <div class="strength-bar-fill" id="strength-bar"></div>
+          </div>
+          <span class="strength-text" id="strength-text">Strength: Weak</span>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="form-group-floating" style="margin-bottom: 14px;">
+          <input type="password" id="confirm_password" name="confirm_password" class="floating-input"
+                 placeholder=" " required autocomplete="new-password" />
+          <label class="floating-label" for="confirm_password">Confirm Password</label>
+        </div>
+        
+        <!-- Real-Time Password Match indicator -->
+        <span class="match-text" id="match-indicator" style="display: none;"></span>
+
+        <!-- Terms & Conditions Checkbox -->
+        <div class="terms-container">
+          <input type="checkbox" id="terms" name="terms" required />
+          <label for="terms">I agree to the <a href="#" onclick="event.preventDefault(); alert('Terms of Service: This portal is strictly for clinical and dashboard administration. Unauthorized use is prohibited.');">Terms of Services</a> and <a href="#" onclick="event.preventDefault(); alert('Privacy Policy: All health records are encrypted and HIPAA-compliant.');">Privacy Policies</a>.</label>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn-submit" id="submit-btn">
+          <span class="btn-spinner" id="btn-spinner"></span>
+          <span id="btn-text">Register Account</span>
+        </button>
+
+      </form>
+
+      <div class="form-footer">
+        Already have a Patient account? <a href="{{ url_for('login') }}">Sign In</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const password = document.getElementById('password');
+  const confirmPassword = document.getElementById('confirm_password');
+  const strengthContainer = document.getElementById('strength-container');
+  const strengthBar = document.getElementById('strength-bar');
+  const strengthText = document.getElementById('strength-text');
+  const matchIndicator = document.getElementById('match-indicator');
+
+  // Real-time password strength meter
+  password.addEventListener('input', () => {
+    const val = password.value;
+    if (val.length === 0) {
+      strengthContainer.style.display = 'none';
+      return;
+    }
+
+    strengthContainer.style.display = 'block';
+    
+    let score = 0;
+    if (val.length >= 6) score += 25;
+    if (/[A-Z]/.test(val)) score += 25;
+    if (/[0-9]/.test(val)) score += 25;
+    if (/[^A-Za-z0-9]/.test(val)) score += 25;
+
+    strengthBar.style.width = score + '%';
+    
+    if (score <= 25) {
+      strengthBar.style.backgroundColor = '#EF4444'; // Red
+      strengthText.textContent = 'Strength: Weak (length >= 6 recommended)';
+      strengthText.style.color = '#EF4444';
+    } else if (score <= 50) {
+      strengthBar.style.backgroundColor = '#F59E0B'; // Orange
+      strengthText.textContent = 'Strength: Moderate (add uppercase/numbers)';
+      strengthText.style.color = '#F59E0B';
+    } else if (score <= 75) {
+      strengthBar.style.backgroundColor = '#3B82F6'; // Blue
+      strengthText.textContent = 'Strength: Strong';
+      strengthText.style.color = '#3B82F6';
+    } else {
+      strengthBar.style.backgroundColor = '#10B981'; // Green
+      strengthText.textContent = 'Strength: Excellent (Highly Secure)';
+      strengthText.style.color = '#10B981';
+    }
+
+    checkMatch();
+  });
+
+  // Real-time password matching validation
+  function checkMatch() {
+    const pVal = password.value;
+    const cpVal = confirmPassword.value;
+
+    if (cpVal.length === 0) {
+      matchIndicator.style.display = 'none';
+      confirmPassword.style.borderColor = '#E2E8F0';
+      return;
+    }
+
+    matchIndicator.style.display = 'block';
+
+    if (pVal === cpVal) {
+      matchIndicator.textContent = '✓ Passwords match';
+      matchIndicator.style.color = '#10B981'; // Green
+      confirmPassword.style.borderColor = '#10B981';
+      confirmPassword.style.boxShadow = '0 0 0 4px rgba(16, 185, 129, 0.15)';
+    } else {
+      matchIndicator.textContent = '✕ Passwords do not match';
+      matchIndicator.style.color = '#EF4444'; // Red
+      confirmPassword.style.borderColor = '#EF4444';
+      confirmPassword.style.boxShadow = '0 0 0 4px rgba(239, 68, 68, 0.15)';
+    }
+  }
+
+  confirmPassword.addEventListener('input', checkMatch);
+
+  // Loading state on form submit
+  const signupForm = document.getElementById('signup-form');
+  const submitBtn = document.getElementById('submit-btn');
+  const btnSpinner = document.getElementById('btn-spinner');
+  const btnText = document.getElementById('btn-text');
+
+  if (signupForm && submitBtn) {
+    signupForm.addEventListener('submit', (e) => {
+      if (password.value !== confirmPassword.value) {
+        e.preventDefault();
+        alert('Passwords must match before registering.');
+        return;
+      }
+      submitBtn.disabled = true;
+      btnSpinner.style.display = 'inline-block';
+      btnText.textContent = 'Creating Account...';
+    });
+  }
+</script>
+
+</body>
+</html>

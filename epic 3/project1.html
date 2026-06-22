@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Appointment Portal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+    <h1>Doctor Management System</h1>
+</header>
+
+<div class="container">
+
+    <!-- Patient Records -->
+    <div class="card">
+        <h2>Patient Records</h2>
+
+        <input type="text" id="searchPatient" placeholder="Search Patient">
+        <button onclick="searchPatient()">Search</button>
+
+        <table id="patientTable">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Disease</th>
+            </tr>
+
+            <tr>
+                <td>101</td>
+                <td>Rahul</td>
+                <td>Fever</td>
+            </tr>
+
+            <tr>
+                <td>102</td>
+                <td>Priya</td>
+                <td>Diabetes</td>
+            </tr>
+
+            <tr>
+                <td>103</td>
+                <td>Amit</td>
+                <td>Cold</td>
+            </tr>
+        </table>
+    </div>
+     <div class="stats">
+    <div class="card">
+        <h3>150</h3>
+        <p>Total Patients</p>
+    </div>
+
+    <div class="card">
+        <h3>25</h3>
+        <p>Appointments Today</p>
+    </div>
+
+    <div class="card">
+        <h3>12</h3>
+        <p>Pending Prescriptions</p>
+    </div>
+
+    <div class="card">
+        <h3>8</h3>
+        <p>Doctors Online</p>
+    </div>
+</div>
+
+    <!-- Upload Prescription -->
+    <div class="card">
+        <h2>Upload Prescription</h2>
+
+        <input type="file" id="fileUpload">
+        <button onclick="uploadPrescription()">Upload</button>
+
+        <p id="uploadMsg"></p>
+    </div>
+    <div class="card">
+        <h2>Appointments</h2>
+
+        <table>
+            <tr>
+                <th>Patient</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+
+            <tr>
+                <td>Anjali</td>
+                <td>20 June 2026</td>
+                <td id="status1">Pending</td>
+                <td>
+                    <button onclick="accept(1)">Accept</button>
+                    <button onclick="reject(1)">Reject</button>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Rohan</td>
+                <td>21 June 2026</td>
+                <td id="status2">Pending</td>
+                <td>
+                    <button onclick="accept(2)">Accept</button>
+                    <button onclick="reject(2)">Reject</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</div>
+
+
+        <div class="card profile">
+    
+    <div>
+        <h2>Dr. Sharma</h2>
+        <p>Cardiologist</p>
+        <p>Available Today</p>
+    </div>
+</div>
+    <!-- Appointment Form -->
+      <header> Doctor Appointment Portal</header>
+    <div class="card">
+        <h2>Request Appointment</h2>
+
+        <input type="text" id="name" placeholder="Patient Name">
+        <input type="date" id="date">
+        <textarea id="reason" placeholder="Reason for Appointment"></textarea>
+
+        <button onclick="bookAppointment()">Submit Request</button>
+
+        <p id="message"></p>
+    </div>
+
+    <!-- Appointment Table -->
+    <div class="card">
+        
+        <h2>Appointment Requests</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Patient Name</th>
+                    <th>Date</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody id="appointmentTable"></tbody>
+        </table>
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

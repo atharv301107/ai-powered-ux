@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% block title %}Hub Dashboard{% endblock %}
+{% block page_title %}Hub Dashboard{% endblock %}
+
+{% block content %}
+<!-- Personalized welcome hero banner -->
+<div class="profile-hero reveal">
+  <div class="profile-avatar">
+    {{ session.get('user_name','U')[0].upper() }}
+  </div>
+  <div>
+    <h2>Welcome back, {{ session.get('user_name','User') }}! 👋</h2>
+    <p>Good to see you today. Here is an overview of what is happening across the MediCare system.</p>
+    <div class="profile-tags">
+      <span class="profile-tag"><i class="fa-solid fa-shield-halved"></i> Role: {{ session.get('user_role','') }}</span>
+      <span class="profile-tag"><i class="fa-solid fa-envelope"></i> {{ session.get('user_email','') }}</span>
+      <span class="profile-tag" style="background:rgba(34,197,94,.2);border-color:rgba(34,197,94,.3);"><i class="fa-solid fa-circle-check"></i> System Active</span>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Row -->
+<div class="stats-grid reveal" style="margin-top:24px;">
+  {% if session.get('user_role') != 'Patient' %}
+  <div class="stat-card blue">
+    <div class="stat-icon-wrap">👥</div>
+    <div class="stat-card-info">
+      <h3 data-count="{{ total_users }}">{{ total_users }}</h3>
+      <p>Total Users</p>
+    </div>
+  </div>
+  <div class="stat-card green">
+    <div class="stat-icon-wrap">👨‍⚕️</div>
+    <div class="stat-card-info">
+      <h3 data-count="{{ total_doctors }}">{{ total_doctors }}</h3>
+      <p>Verified Doctors</p>
+    </div>
+  </div>
+  <div class="stat-card purple">
+    <div class="stat-icon-wrap">🩺</div>
+    <div class="stat-card-info">
+      <h3 data-count="{{ total_patients }}">{{ total_patients }}</h3>
+      <p>Registered Patients</p>
+    </div>
+  </div>
+  {% endif %}
+  <div class="stat-card orange">
+    <div class="stat-icon-wrap">📅</div>
+    <div class="stat-card-info">
+      <h3 data-count="{{ total_appointments }}">{{ total_appointments }}</h3>
+      <p>Scheduled Appointments</p>
+    </div>
+  </div>
+</div>
+
+<!-- Your Modules Section -->
+<div class="reveal" style="margin-top:36px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+    <h3 style="font-family:var(--font-head);font-weight:800;color:var(--text-heading);margin-bottom:0;">Your Portal Modules</h3>
+    <span style="font-size:12px;color:var(--text-muted);">Select a module to view dashboard operations</span>
+  </div>
+  
+  <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:20px;">
+    
+    {% if session.get('user_role') == 'Admin' %}
+    <!-- Admin Dashboard Card -->
+    <a href="{{ url_for('admin_dashboard') }}" class="content-card" style="padding:22px;display:flex;flex-direction:column;justify-content:between;min-height:160px;transition:var(--t-base);border-top:4px solid var(--primary);">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span style="font-size:24px;">📊</span>
+          <span class="badge badge-primary">Admin</span>
+        </div>
+        <h4 style="font-weight:800;color:var(--text-heading);margin-bottom:6px;">Admin Dashboard</h4>
+        <p style="font-size:12.5px;color:var(--text-sub);line-height:1.5;">Access analytics, system trends, recent appointments, and user configurations.</p>
+      </div>
+      <div style="margin-top:14px;font-size:12px;font-weight:700;color:var(--primary);display:flex;align-items:center;gap:6px;">
+        Open Admin Tools <i class="fa-solid fa-arrow-right"></i>
+      </div>
+    </a>
+    {% endif %}
+
+    {% if session.get('user_role') == 'Patient' %}
+    <!-- Patient Dashboard Card -->
+    <a href="{{ url_for('patient_dashboard') }}" class="content-card" style="padding:22px;display:flex;flex-direction:column;justify-content:between;min-height:160px;transition:var(--t-base);border-top:4px solid var(--primary);">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span style="font-size:24px;">🩺</span>
+          <span class="badge badge-primary">Patient</span>
+        </div>
+        <h4 style="font-weight:800;color:var(--text-heading);margin-bottom:6px;">My Health Dashboard</h4>
+        <p style="font-size:12.5px;color:var(--text-sub);line-height:1.5;">Check vitals, medication adherence charts, health scores, and record books.</p>
+      </div>
+      <div style="margin-top:14px;font-size:12px;font-weight:700;color:var(--primary);display:flex;align-items:center;gap:6px;">
+        Open Patient Portal <i class="fa-solid fa-arrow-right"></i>
+      </div>
+    </a>
+    {% endif %}
+
+    {% if session.get('user_role') == 'Doctor' %}
+    <!-- Doctor Dashboard Card -->
+    <a href="{{ url_for('doctor_dashboard') }}" class="content-card" style="padding:22px;display:flex;flex-direction:column;justify-content:between;min-height:160px;transition:var(--t-base);border-top:4px solid var(--secondary);">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span style="font-size:24px;">👨‍⚕️</span>
+          <span class="badge badge-teal">Doctor</span>
+        </div>
+        <h4 style="font-weight:800;color:var(--text-heading);margin-bottom:6px;">Doctor Dashboard</h4>
+        <p style="font-size:12.5px;color:var(--text-sub);line-height:1.5;">Access scheduling, today's patient queue, appointments, and record management.</p>
+      </div>
+      <div style="margin-top:14px;font-size:12px;font-weight:700;color:var(--secondary);display:flex;align-items:center;gap:6px;">
+        Open Doctor Portal <i class="fa-solid fa-arrow-right"></i>
+      </div>
+    </a>
+    {% endif %}
+
+    <!-- AI Chatbot Card -->
+    <a href="{{ url_for('chatbot') }}" class="content-card" style="padding:22px;display:flex;flex-direction:column;justify-content:between;min-height:160px;transition:var(--t-base);border-top:4px solid var(--accent);">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span style="font-size:24px;">🤖</span>
+          <span class="badge badge-accent">AI Tool</span>
+        </div>
+        <h4 style="font-weight:800;color:var(--text-heading);margin-bottom:6px;">AI Assistant</h4>
+        <p style="font-size:12.5px;color:var(--text-sub);line-height:1.5;">Get instant AI answers regarding symptoms, health advice, and medical queries.</p>
+      </div>
+      <div style="margin-top:14px;font-size:12px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:6px;">
+        Consult MediBot AI <i class="fa-solid fa-arrow-right"></i>
+      </div>
+    </a>
+
+    <!-- OCR Card -->
+    <a href="{{ url_for('ocr') }}" class="content-card" style="padding:22px;display:flex;flex-direction:column;justify-content:between;min-height:160px;transition:var(--t-base);border-top:4px solid var(--secondary);">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span style="font-size:24px;">📷</span>
+          <span class="badge badge-teal">Scan Tool</span>
+        </div>
+        <h4 style="font-weight:800;color:var(--text-heading);margin-bottom:6px;">Prescription OCR</h4>
+        <p style="font-size:12.5px;color:var(--text-sub);line-height:1.5;">Scan physical prescription sheets to extract drug listings and dosage rates.</p>
+      </div>
+      <div style="margin-top:14px;font-size:12px;font-weight:700;color:var(--secondary);display:flex;align-items:center;gap:6px;">
+        Start Scanner <i class="fa-solid fa-arrow-right"></i>
+      </div>
+    </a>
+
+    <!-- Health Analytics Card -->
+    <a href="{{ url_for('analytics') }}" class="content-card" style="padding:22px;display:flex;flex-direction:column;justify-content:between;min-height:160px;transition:var(--t-base);border-top:4px solid var(--primary);">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span style="font-size:24px;">🔮</span>
+          <span class="badge badge-primary">Analytics</span>
+        </div>
+        <h4 style="font-weight:800;color:var(--text-heading);margin-bottom:6px;">Health Risk Analytics</h4>
+        <p style="font-size:12.5px;color:var(--text-sub);line-height:1.5;">Run cardiovascular or diabetes risk evaluations based on age and clinical vitals.</p>
+      </div>
+      <div style="margin-top:14px;font-size:12px;font-weight:700;color:var(--primary);display:flex;align-items:center;gap:6px;">
+        Open Calculator <i class="fa-solid fa-arrow-right"></i>
+      </div>
+    </a>
+    
+  </div>
+</div>
+
+<!-- Quick Actions & Recent Activity Grid -->
+<div class="grid-2 reveal" style="margin-top:36px;margin-bottom:24px;">
+  <!-- Quick Actions -->
+  <div class="content-card" style="padding:24px;">
+    <h4 style="font-family:var(--font-head);font-weight:800;color:var(--text-heading);margin-bottom:14px;">⚡ Quick Actions</h4>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <a href="{{ url_for('profile') }}" class="btn btn-outline" style="text-align:left;display:flex;align-items:center;gap:12px;justify-content:flex-start;">
+        <span style="font-size:18px;">👤</span> Update Profile Preferences
+      </a>
+      {% if session.get('user_role') == 'Admin' %}
+      <a href="{{ url_for('add_user') }}" class="btn btn-outline" style="text-align:left;display:flex;align-items:center;gap:12px;justify-content:flex-start;">
+        <span style="font-size:18px;">👥</span> Add a New System User
+      </a>
+      <a href="{{ url_for('add_appointment') }}" class="btn btn-outline" style="text-align:left;display:flex;align-items:center;gap:12px;justify-content:flex-start;">
+        <span style="font-size:18px;">📅</span> Book a New Appointment
+      </a>
+      {% elif session.get('user_role') == 'Patient' %}
+      <a href="{{ url_for('patient_appointments') }}" class="btn btn-outline" style="text-align:left;display:flex;align-items:center;gap:12px;justify-content:flex-start;">
+        <span style="font-size:18px;">📅</span> Book an Appointment
+      </a>
+      <a href="{{ url_for('patient_reminders') }}" class="btn btn-outline" style="text-align:left;display:flex;align-items:center;gap:12px;justify-content:flex-start;">
+        <span style="font-size:18px;">💊</span> Set Medication Reminder
+      </a>
+      {% elif session.get('user_role') == 'Doctor' %}
+      <a href="{{ url_for('doctor_dashboard') }}" class="btn btn-outline" style="text-align:left;display:flex;align-items:center;gap:12px;justify-content:flex-start;">
+        <span style="font-size:18px;">📅</span> View Appointments Queue
+      </a>
+      {% endif %}
+    </div>
+  </div>
+  
+  <!-- Recent Activity -->
+  <div class="content-card" style="padding:24px;">
+    <h4 style="font-family:var(--font-head);font-weight:800;color:var(--text-heading);margin-bottom:14px;">🕒 Recent System Log</h4>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:var(--primary);"></div>
+        <div class="timeline-time">Just now</div>
+        <div class="timeline-title">Session Opened</div>
+        <div class="timeline-desc">User {{ session.get('user_name','') }} logged in successfully from this IP.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:var(--secondary);"></div>
+        <div class="timeline-time">2 hours ago</div>
+        <div class="timeline-title">Database Synced</div>
+        <div class="timeline-desc">Health statistics table successfully seed-verified.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:var(--accent);"></div>
+        <div class="timeline-time">1 day ago</div>
+        <div class="timeline-title">MediBot Initialized</div>
+        <div class="timeline-desc">AI health assistant linked with Gemini 2.5 API.</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

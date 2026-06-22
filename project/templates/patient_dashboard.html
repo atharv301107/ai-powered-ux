@@ -1,0 +1,417 @@
+{% extends 'base.html' %}
+{% block title %}Patient Dashboard{% endblock %}
+{% block page_title %}Patient Dashboard{% endblock %}
+
+{% block content %}
+<!-- Profile Hero Header -->
+<div class="profile-hero reveal">
+  <div class="profile-avatar">
+    {{ patient.name[0].upper() if patient else user.name[0].upper() }}
+  </div>
+  <div>
+    <h2>{{ patient.name if patient else user.name }}</h2>
+    <p>{{ patient.email if patient else user.email }}</p>
+    <div class="profile-tags">
+      <span class="profile-tag"><i class="fa-solid fa-droplet" style="color:#ef4444;"></i> Blood: {{ patient.blood_group or 'O+' }}</span>
+      <span class="profile-tag"><i class="fa-solid fa-cake-candles"></i> Age: {{ patient.age or 30 }} yrs</span>
+      <span class="profile-tag"><i class="fa-solid fa-user-doctor"></i> PCP: {{ patient.doctor or 'Dr. Sneha Patil' }}</span>
+      <span class="profile-tag"><i class="fa-solid fa-location-dot"></i> {{ patient.address or 'Pune, Maharashtra' }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- Stats row -->
+<div class="stats-grid reveal" style="margin-bottom:28px;">
+  <div class="stat-card green">
+    <div class="stat-icon-wrap">📅</div>
+    <div class="stat-card-info">
+      <h3 data-count="{{ upcoming|length }}">{{ upcoming|length }}</h3>
+      <p>Upcoming Bookings</p>
+    </div>
+  </div>
+  <div class="stat-card blue">
+    <div class="stat-icon-wrap">🏥</div>
+    <div class="stat-card-info">
+      <h3 data-count="{{ completed|length }}">{{ completed|length }}</h3>
+      <p>Completed Visits</p>
+    </div>
+  </div>
+  <div class="stat-card orange">
+    <div class="stat-icon-wrap">💊</div>
+    <div class="stat-card-info">
+      <h3 data-count="{{ reminders|length }}">{{ reminders|length }}</h3>
+      <p>Active Reminders</p>
+    </div>
+  </div>
+  <div class="stat-card purple">
+    <div class="stat-icon-wrap">📂</div>
+    <div class="stat-card-info">
+      <h3 data-count="{{ (patient.medical_records|length) if patient and patient.medical_records else 2 }}">{{ (patient.medical_records|length) if patient and patient.medical_records else 2 }}</h3>
+      <p>Medical Records</p>
+    </div>
+  </div>
+</div>
+
+<!-- Health Ring Widget + Mini Cards Grid -->
+<div class="grid-2 reveal" style="margin-bottom:28px;">
+  <!-- Health Score Widget -->
+  <div class="content-card" style="display:flex;align-items:center;gap:30px;padding:32px;">
+    <div class="health-ring">
+      <svg width="120" height="120" id="health-ring-svg">
+        <circle cx="60" cy="60" r="50" fill="none" stroke="var(--border)" stroke-width="10"></circle>
+        <circle cx="60" cy="60" r="50" fill="none" stroke="#22c55e" stroke-width="10" 
+                stroke-dasharray="314" stroke-dashoffset="314" stroke-linecap="round" id="health-ring-circle"
+                style="transition: stroke-dashoffset 1s ease-in-out;"></circle>
+      </svg>
+      <div class="health-ring-text">
+        <div class="health-ring-value">78</div>
+        <div class="health-ring-label">Health Score</div>
+      </div>
+    </div>
+    <div style="flex:1;">
+      <h4 style="font-family:var(--font-head);font-weight:800;color:var(--text-heading);margin-bottom:6px;">Current Wellness Status</h4>
+      <p style="color:var(--text-sub);font-size:13px;line-height:1.5;margin-bottom:14px;">Your vitals look highly stable. Keep maintaining your lifestyle!</p>
+      
+      <div style="display:flex;gap:12px;font-size:11.5px;">
+        <div style="background:var(--bg);padding:8px 12px;border-radius:8px;border:1px solid var(--border);">
+          <strong style="display:block;color:var(--text-heading);">BP</strong>
+          <span style="color:#22c55e;">120/80 (Optimal)</span>
+        </div>
+        <div style="background:var(--bg);padding:8px 12px;border-radius:8px;border:1px solid var(--border);">
+          <strong style="display:block;color:var(--text-heading);">Glucose</strong>
+          <span style="color:#22c55e;">95 mg/dL (Normal)</span>
+        </div>
+        <div style="background:var(--bg);padding:8px 12px;border-radius:8px;border:1px solid var(--border);">
+          <strong style="display:block;color:var(--text-heading);">BMI</strong>
+          <span style="color:#22c55e;">22.4 (Good)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions Row -->
+  <div class="content-card" style="padding:28px;">
+    <h4 style="font-family:var(--font-head);font-weight:800;color:var(--text-heading);margin-bottom:16px;">⚡ Quick Operations</h4>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <button class="btn btn-primary" onclick="openModal('appt-modal')" style="padding:14px;"><i class="fa-solid fa-calendar-plus"></i> Book Consultation</button>
+      <button class="btn btn-secondary" onclick="openModal('reminder-modal')" style="padding:14px;"><i class="fa-solid fa-bell"></i> Add Medication</button>
+      <a href="{{ url_for('analytics') }}" class="btn btn-outline" style="padding:14px;border:1.5px solid var(--border);"><i class="fa-solid fa-chart-line"></i> Risk Analytics</a>
+      <a href="{{ url_for('ocr') }}" class="btn btn-ghost" style="padding:14px;border:1.5px solid var(--border);"><i class="fa-solid fa-camera"></i> Scan Prescription</a>
+    </div>
+  </div>
+</div>
+
+<!-- Upcoming & Reminders Mini Row -->
+<div class="grid-2 reveal" style="margin-bottom:28px;">
+  <!-- Upcoming Appointments -->
+  <div class="content-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-subtle);padding-bottom:12px;margin-bottom:16px;">
+      <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text-heading);margin-bottom:0;">Upcoming Consultations</h5>
+      <a href="{{ url_for('patient_appointments') }}" class="badge badge-primary">View All</a>
+    </div>
+    <div>
+      {% for a in upcoming[:3] %}
+      <div class="appt-mini">
+        <div class="appt-date-box">
+          <span class="day">{{ a.appointment_date.split('-')[2] }}</span>
+          <span class="mon">{{ a.appointment_date.split('-')[1] }}</span>
+        </div>
+        <div style="flex:1;">
+          <div class="appt-doctor">{{ a.doctor_name }}</div>
+          <div class="appt-meta">🕒 {{ a.time }} · Dept: <span style="text-transform:capitalize;">{{ a.department }}</span></div>
+        </div>
+        <span class="status-badge status-{{ a.status|lower }}">{{ a.status }}</span>
+      </div>
+      {% else %}
+      <div style="text-align:center;padding:30px 10px;color:var(--text-muted);font-size:13px;">
+        No upcoming appointments scheduled.
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Medicine Reminders -->
+  <div class="content-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-subtle);padding-bottom:12px;margin-bottom:16px;">
+      <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text-heading);margin-bottom:0;">Medicine Trackers</h5>
+      <a href="{{ url_for('patient_reminders') }}" class="badge badge-teal">Configure</a>
+    </div>
+    <div>
+      {% for r in reminders[:3] %}
+      <div class="reminder-mini">
+        <div class="pill-icon">💊</div>
+        <div style="flex:1;">
+          <div class="med-name">{{ r.medicine }}</div>
+          <div class="med-time">⏰ {{ r.time }} · Frequency: {{ r.frequency }}</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" class="reminder-toggle" data-id="{{ r.id }}" {% if r.active %}checked{% endif %} onchange="toggleReminder(this)" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      {% else %}
+      <div style="text-align:center;padding:30px 10px;color:var(--text-muted);font-size:13px;">
+        No active medication reminders configured.
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- Active Prescriptions & Lab Reports -->
+<div class="grid-2 reveal" style="margin-bottom:28px;">
+  <!-- Prescriptions Card -->
+  <div class="content-card">
+    <div style="border-bottom:1px solid var(--border-subtle);padding-bottom:12px;margin-bottom:16px;">
+      <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text-heading);margin-bottom:0;">💊 Active Prescriptions</h5>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div style="padding:14px; background:var(--bg); border:1px solid var(--border); border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-weight:700; color:var(--text-heading); font-size:13.5px;">Amlodipine 5mg</div>
+          <div style="color:var(--text-sub); font-size:11.5px; margin-top:2px;">Dr. Sneha Patil · 1 pill daily (Morning)</div>
+        </div>
+        <span style="font-size:11px; background:var(--primary-light); color:var(--primary); padding:4px 8px; border-radius:50px; font-weight:600;">Active</span>
+      </div>
+      <div style="padding:14px; background:var(--bg); border:1px solid var(--border); border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-weight:700; color:var(--text-heading); font-size:13.5px;">Atorvastatin 10mg</div>
+          <div style="color:var(--text-sub); font-size:11.5px; margin-top:2px;">Dr. Sneha Patil · 1 pill daily (Night)</div>
+        </div>
+        <span style="font-size:11px; background:var(--primary-light); color:var(--primary); padding:4px 8px; border-radius:50px; font-weight:600;">Active</span>
+      </div>
+      <div style="padding:14px; background:var(--bg); border:1px solid var(--border); border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-weight:700; color:var(--text-heading); font-size:13.5px;">Paracetamol 650mg</div>
+          <div style="color:var(--text-sub); font-size:11.5px; margin-top:2px;">Dr. Patil · 1 pill as needed (Fever)</div>
+        </div>
+        <span style="font-size:11px; background:var(--success-light); color:var(--success); padding:4px 8px; border-radius:50px; font-weight:600;">SOS</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lab Files Card -->
+  <div class="content-card">
+    <div style="border-bottom:1px solid var(--border-subtle);padding-bottom:12px;margin-bottom:16px;">
+      <h5 style="font-family:var(--font-head);font-weight:800;color:var(--text-heading);margin-bottom:0;">📋 Lab Diagnostic Reports</h5>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div style="padding:14px; background:var(--bg); border:1px solid var(--border); border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-weight:700; color:var(--text-heading); font-size:13.5px;">Lipid Profile Report</div>
+          <div style="color:var(--text-sub); font-size:11.5px; margin-top:2px;">Date: 2026-06-12 · Size: 1.4 MB</div>
+        </div>
+        <a href="#" onclick="event.preventDefault(); alert('Downloading Lipid Profile Report (PDF)...');" class="btn btn-sm btn-ghost" style="padding:8px 12px; border:1px solid var(--border); font-size:12px;"><i class="fa-solid fa-download"></i> PDF</a>
+      </div>
+      <div style="padding:14px; background:var(--bg); border:1px solid var(--border); border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-weight:700; color:var(--text-heading); font-size:13.5px;">Complete Blood Count (CBC)</div>
+          <div style="color:var(--text-sub); font-size:11.5px; margin-top:2px;">Date: 2026-06-12 · Size: 920 KB</div>
+        </div>
+        <a href="#" onclick="event.preventDefault(); alert('Downloading CBC Report (PDF)...');" class="btn btn-sm btn-ghost" style="padding:8px 12px; border:1px solid var(--border); font-size:12px;"><i class="fa-solid fa-download"></i> PDF</a>
+      </div>
+      <div style="padding:14px; background:var(--bg); border:1px solid var(--border); border-radius:10px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-weight:700; color:var(--text-heading); font-size:13.5px;">Urine Routine Analysis</div>
+          <div style="color:var(--text-sub); font-size:11.5px; margin-top:2px;">Date: 2026-05-18 · Size: 1.1 MB</div>
+        </div>
+        <a href="#" onclick="event.preventDefault(); alert('Downloading Urine Analysis Report (PDF)...');" class="btn btn-sm btn-ghost" style="padding:8px 12px; border:1px solid var(--border); font-size:12px;"><i class="fa-solid fa-download"></i> PDF</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Medical Records Card -->
+<div class="content-card reveal" style="padding:24px;margin-bottom:40px;">
+  <h4 style="font-family:var(--font-head);font-weight:800;color:var(--text-heading);margin-bottom:14px;">📂 Historical Medical Diagnosis</h4>
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Diagnostic Date</th>
+          <th>Assessment / Diagnosis</th>
+          <th>Assigned Practitioner</th>
+          <th>Clinical Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if patient and patient.medical_records %}
+          {% for r in patient.medical_records %}
+          <tr>
+            <td style="font-weight:700;color:var(--text-heading);">{{ r.date }}</td>
+            <td><span class="badge badge-accent">{{ r.diagnosis }}</span></td>
+            <td>{{ r.doctor }}</td>
+            <td style="color:var(--text-sub);max-width:300px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;">{{ r.notes }}</td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td style="font-weight:700;color:var(--text-heading);">2026-06-12</td>
+            <td><span class="badge badge-accent">Cardiovascular Routine</span></td>
+            <td>Dr. Sneha Patil</td>
+            <td style="color:var(--text-sub);">Regular blood pressure monitoring recommended. Normal health score.</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;color:var(--text-heading);">2026-05-18</td>
+            <td><span class="badge badge-success">General Checkup</span></td>
+            <td>Dr. Sneha Patil</td>
+            <td style="color:var(--text-sub);">Perfect glucose ranges. Advised physical activities regularly.</td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal 1: Appointment Booking -->
+<div class="modal-overlay" id="appt-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>📅 Book Consultation</h3>
+      <button class="modal-close" onclick="closeModal('appt-modal')">✕</button>
+    </div>
+    <form method="POST" action="{{ url_for('patient_appointments') }}">
+      <div class="modal-body">
+        <input type="hidden" name="patient_name" value="{{ patient.name if patient else user.name }}" />
+        
+        <div class="form-group" style="margin-bottom:14px;">
+          <label class="form-label" for="doctor_name">Choose Doctor</label>
+          <select id="doctor_name" name="doctor_name" class="form-control" required>
+            <option value="" disabled selected>Select doctor</option>
+            <option value="Dr. Sneha Patil">Dr. Sneha Patil (Cardiology)</option>
+            <option value="Dr. Mehta">Dr. Mehta (Dental)</option>
+            <option value="Dr. Khan">Dr. Khan (Orthopedic)</option>
+            <option value="Dr. Patil">Dr. Patil (General)</option>
+          </select>
+        </div>
+        
+        <div class="form-row" style="margin-bottom:14px;">
+          <div class="form-group">
+            <label class="form-label" for="appointment_date">Date</label>
+            <input type="date" id="appointment_date" name="appointment_date" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="time">Time Slot</label>
+            <input type="text" id="time" name="time" class="form-control" placeholder="e.g. 10:30 AM" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="department">Specialty Department</label>
+          <select id="department" name="department" class="form-control" required>
+            <option value="Cardiology">Cardiology</option>
+            <option value="Dental">Dental</option>
+            <option value="Orthopedic">Orthopedic</option>
+            <option value="General">General</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('appt-modal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Book Consultation</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal 2: Add Medication Reminder -->
+<div class="modal-overlay" id="reminder-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>💊 Add Medicine Reminder</h3>
+      <button class="modal-close" onclick="closeModal('reminder-modal')">✕</button>
+    </div>
+    <form method="POST" action="{{ url_for('patient_reminders') }}">
+      <div class="modal-body">
+        <div class="form-group" style="margin-bottom:14px;">
+          <label class="form-label" for="medicine">Medicine Name &amp; Dosage</label>
+          <div class="input-icon-wrap">
+            <span class="input-prefix">💊</span>
+            <input type="text" id="medicine" name="medicine" class="form-control" placeholder="e.g. Amlodipine 5mg" required />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="rem-time">Daily Intake Time</label>
+            <input type="time" id="rem-time" name="time" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="frequency">Frequency</label>
+            <select id="frequency" name="frequency" class="form-control" required>
+              <option value="Daily">Daily</option>
+              <option value="Twice Daily">Twice Daily</option>
+              <option value="Weekly">Weekly</option>
+              <option value="As Needed">As Needed</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-ghost" onclick="closeModal('reminder-modal')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Reminder</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Animate the Health score ring SVG
+  animateRing(78, '#22c55e');
+});
+
+function animateRing(score, color) {
+  const circle = document.getElementById('health-ring-circle');
+  if (!circle) return;
+  const radius = circle.r.baseVal.value;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (score / 100) * circumference;
+  
+  circle.style.strokeDasharray = circumference;
+  circle.style.strokeDashoffset = circumference;
+  
+  setTimeout(() => {
+    circle.style.strokeDashoffset = offset;
+    circle.style.stroke = color;
+  }, 100);
+}
+
+// Modal open/close functions
+window.openModal = function(id) {
+  const modal = document.getElementById(id);
+  if (modal) modal.classList.add('open');
+};
+
+window.closeModal = function(id) {
+  const modal = document.getElementById(id);
+  if (modal) modal.classList.remove('open');
+};
+
+// Reminder toggle AJAX
+window.toggleReminder = async function(checkbox) {
+  const id = checkbox.getAttribute('data-id');
+  const active = checkbox.checked ? 1 : 0;
+  
+  try {
+    const res = await fetch(`/api/reminders/${id}/toggle`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ active })
+    });
+    const data = await res.json();
+    if (data.success) {
+      showToast(active ? 'Reminder activated! 💊' : 'Reminder paused.', 'info');
+    } else {
+      showToast('Action failed.', 'error');
+      checkbox.checked = !checkbox.checked;
+    }
+  } catch (err) {
+    showToast('Network error.', 'error');
+    checkbox.checked = !checkbox.checked;
+  }
+};
+</script>
+{% endblock %}
